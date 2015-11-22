@@ -1,10 +1,15 @@
 package com.example.tomoyasu.residentapp;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -13,10 +18,11 @@ import android.widget.Toast;
 /**
  * Created by tomoyasu on 2015/11/22.
  */
-public class NotificationChangeService extends Service {
+public class NotificationChangeService extends Service implements SensorEventListener {
     static final String TAG="LocalService";
 
     private static int NOTIFICATION_ID = R.layout.activity_main;
+    private float proximity;
 
     @Override
     public void onCreate() {
@@ -28,6 +34,14 @@ public class NotificationChangeService extends Service {
 
         // 通知バーへの登録
         sendNotification();
+
+        // センサーマネージャの登録
+        SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        if (sensor != null) {
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+            Log.i(TAG, "sensorListener");
+        }
     }
 
     // 通知バーへの登録
@@ -36,6 +50,8 @@ public class NotificationChangeService extends Service {
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
         builder.setSmallIcon(R.drawable.mono);
         builder.setContentTitle("Resident");
+        builder.setContentText("Try put hand");
+        builder.setTicker("Switch on!");
         builder.setOngoing(true);
 
         // 起動したいActivityのIntent
@@ -66,11 +82,32 @@ public class NotificationChangeService extends Service {
     public void onDestroy() {
         // 死ぬときに呼ばれる
         Log.i(TAG, "onDestroy");
-        Toast.makeText(this, "MyService#onDestroy", Toast.LENGTH_SHORT).show();
+
+        // センサーの開放
+        SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.unregisterListener(this);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+            proximity = event.values[0];
+            if (proximity == 0) {
+                Log.i(TAG, "onSensorChanged");
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
