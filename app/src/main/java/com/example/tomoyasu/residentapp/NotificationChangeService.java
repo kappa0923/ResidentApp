@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,9 +21,13 @@ import android.widget.Toast;
  */
 public class NotificationChangeService extends Service implements SensorEventListener {
     static final String TAG="LocalService";
-
+    Handler countHandler;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
+    private long startTime, endTime;
+    private boolean onsw = false;
+    private String morse = "";
+    private int borderTime = 400;
 
     @Override
     public void onCreate() {
@@ -42,6 +47,10 @@ public class NotificationChangeService extends Service implements SensorEventLis
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
             Log.i(TAG, "sensorListener");
         }
+
+        // 非同期処理の開始
+        countHandler = new Handler();
+        countHandler.post(runnable);
     }
 
     // 通知バーへの登録
@@ -69,6 +78,36 @@ public class NotificationChangeService extends Service implements SensorEventLis
         startForeground(NOTIFICATION_ID, notification);
     }
 
+    //裏で走らせてるハンドラ
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (onsw && (System.currentTimeMillis() - startTime) > borderTime*4 && proximity == 0) {
+                onsw =false;
+                morse = "";
+            }
+
+            if (onsw && (System.currentTimeMillis() - endTime) > borderTime*2 && proximity != 0) {
+                onsw = false;
+                Log.i(TAG, "morse:" + morse);
+
+                if (morse.equals("00")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else if (morse.equals("01")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+
+                morse = "";
+            }
+
+            countHandler.postDelayed(runnable, 10); // 呼び出し間隔(ミリ秒)
+        }
+    };
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // 毎回呼ばれる
@@ -81,7 +120,11 @@ public class NotificationChangeService extends Service implements SensorEventLis
     @Override
     public void onDestroy() {
         // 死ぬときに呼ばれる
+        super.onDestroy();
         Log.i(TAG, "onDestroy");
+
+        // ハンドラの開放
+        countHandler.removeCallbacks(runnable);
 
         // センサーの開放
         SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
@@ -98,10 +141,23 @@ public class NotificationChangeService extends Service implements SensorEventLis
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
             proximity = event.values[0];
             if (proximity == 0) {
+                // 近接時
                 Log.i(TAG, "onSensorChanged");
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+
+                onsw = true;
+                startTime = endTime = System.currentTimeMillis();
+
+                // 暗黙的インテント
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+            } else if (onsw) {
+                // 非近接時
+                endTime = System.currentTimeMillis();
+
+                // モールス信号の判別
+                if ( (endTime - startTime) <= borderTime) morse = morse + "0";
+                else morse = morse + "1";
             }
         }
     }
