@@ -16,18 +16,29 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by tomoyasu on 2015/11/22.
  */
 public class NotificationChangeService extends Service implements SensorEventListener {
     static final String TAG="LocalService";
+
     Handler countHandler;
+    private static Map<String, Intent> map;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
     private long startTime, endTime;
     private boolean onsw = false;
     private String morse = "";
     private int borderTime = 400;
+
+    static {
+        map = new HashMap<>();
+        map.put("00", new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/")));
+        map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
+    }
 
     @Override
     public void onCreate() {
@@ -91,15 +102,21 @@ public class NotificationChangeService extends Service implements SensorEventLis
                 onsw = false;
                 Log.i(TAG, "morse:" + morse);
 
-                if (morse.equals("00")) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                } else if (morse.equals("01")) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/"));
+                if (map.containsKey(morse)) {
+                    Intent intent = map.get(morse);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
+
+//                if (morse.equals("00")) {
+//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                } else if (morse.equals("01")) {
+//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/"));
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                }
 
                 morse = "";
             }
