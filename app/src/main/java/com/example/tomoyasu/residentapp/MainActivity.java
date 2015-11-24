@@ -53,7 +53,10 @@ public class MainActivity extends Activity {
         public void onClick(View v) {
             switch(v.getId()) {
                 case R.id.StartButton:
-                    startService(new Intent(MainActivity.this, NotificationChangeService.class));
+                    Log.i(TAG, "Start Button");
+                    Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                    intent.setAction(Intent.ACTION_PICK);
+                    startActivityForResult(intent, 123);
                     break;
                 case R.id.StopButton:
                     stopService(new Intent(MainActivity.this, NotificationChangeService.class));
@@ -61,5 +64,28 @@ public class MainActivity extends Activity {
             }
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == 123 && resultCode == RESULT_OK) {
+            Log.i(TAG, "Return:" + intent);
+
+//        Button btn = (Button)findViewById(R.id.TestButton);
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(intent);
+//            }
+//        });
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        sw.setChecked(NotificationChangeService.state_Notifi);
+    }
 
 }
