@@ -23,6 +23,7 @@ public class MainActivity extends Activity {
 
         // トグルスイッチ
         sw = (Switch)findViewById(R.id.SwitchButton);
+        sw.setChecked(NotificationChangeService.state_Notifi);
         sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

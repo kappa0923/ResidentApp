@@ -26,7 +26,9 @@ public class NotificationChangeService extends Service implements SensorEventLis
     static final String TAG="LocalService";
 
     Handler countHandler;
+    public static boolean state_Notifi;
     private static Map<String, Intent> map;
+    private static Map<String, String> option;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
     private long startTime, endTime;
@@ -38,6 +40,9 @@ public class NotificationChangeService extends Service implements SensorEventLis
         map = new HashMap<>();
         map.put("00", new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/")));
         map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
+
+        option = new HashMap<>();
+        option.put("10", "hoge");
     }
 
     @Override
@@ -47,6 +52,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
         // 画面内に通知
         Log.i(TAG, "onCreate");
         Toast.makeText(this, "MyService#onCreate", Toast.LENGTH_SHORT).show();
+        state_Notifi = true;
 
         // 通知バーへの登録
         sendNotification();
@@ -106,6 +112,11 @@ public class NotificationChangeService extends Service implements SensorEventLis
                     Intent intent = map.get(morse);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                } else if (option.containsKey(morse)) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
                 }
 
 //                if (morse.equals("00")) {
@@ -139,6 +150,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
         // 死ぬときに呼ばれる
         super.onDestroy();
         Log.i(TAG, "onDestroy");
+        state_Notifi = false;
 
         // ハンドラの開放
         countHandler.removeCallbacks(runnable);
