@@ -26,14 +26,14 @@ public class NotificationChangeService extends Service implements SensorEventLis
     static final String TAG="LocalService";
 
     Handler countHandler;
-    public static boolean state_Notifi;
-    private static Map<String, Intent> map;
-    private static Map<String, String> option;
+    public static boolean state_Notifi; // Notificationの状態を監視
+    public static Map<String, Intent> map;
+    public static Map<String, String> option;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
     private long startTime, endTime;
     private boolean onsw = false;
-    private String morse = "";
+    public static String morse = "";
     private int borderTime = 400;
 
     static {
@@ -42,7 +42,8 @@ public class NotificationChangeService extends Service implements SensorEventLis
         map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
 
         option = new HashMap<>();
-        option.put("10", "hoge");
+        option.put("10", "HOME");
+        option.put("000", "CALL");
     }
 
     @Override
@@ -113,6 +114,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else if (option.containsKey(morse)) {
+                    // HOMEボタンの呼び出し
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                     intent.addCategory(Intent.CATEGORY_HOME);
