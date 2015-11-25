@@ -3,8 +3,8 @@ package com.example.tomoyasu.residentapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,18 +35,32 @@ public class ListActivity extends Activity {
 
         // 端末にインストール済のアプリケーション一覧情報を取得
         final PackageManager pm = getPackageManager();
-        final int flags = PackageManager.GET_UNINSTALLED_PACKAGES;
-        final List<ApplicationInfo> installedAppList = pm.getInstalledApplications(flags);
+        // アプリがランチャーかフィルタをかける
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final List<ResolveInfo> appInfo = pm.queryIntentActivities(intent, 0);
+//        final int flags = PackageManager.GET_UNINSTALLED_PACKAGES;
+//        final List<ApplicationInfo> installedAppList = pm.getInstalledApplications(flags);
 
         // リストに一覧データを格納する
         final List<AppData> dataList = new ArrayList<>();
-        for (ApplicationInfo app : installedAppList) {
+        for (ResolveInfo app : appInfo) {
             AppData data = new AppData();
             data.label = app.loadLabel(pm).toString();
             data.icon = app.loadIcon(pm);
-            data.pname = app.packageName;
+            data.pname = app.activityInfo.packageName;
             dataList.add(data);
         }
+
+//        for (ApplicationInfo app : installedAppList) {
+//            // プリインアプリだったら飛ばす
+//            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) continue;
+//            AppData data = new AppData();
+//            data.label = app.loadLabel(pm).toString();
+//            data.icon = app.loadIcon(pm);
+//            data.pname = app.packageName;
+//            dataList.add(data);
+//        }
 
         // リストビューにアプリケーションの一覧を表示する
         final ListView listView = new ListView(this);
@@ -55,9 +69,9 @@ public class ListActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ApplicationInfo item = installedAppList.get(position);
+                ResolveInfo item = appInfo.get(position);
                 PackageManager pManager = getPackageManager();
-                Intent intent = pManager.getLaunchIntentForPackage(item.packageName);
+                Intent intent = pManager.getLaunchIntentForPackage(item.activityInfo.packageName);
                 // 一覧から取得したintentを元のactivityに返す
                 setResult(RESULT_OK, intent);
                 Log.i(TAG, "item clicked:" + intent);

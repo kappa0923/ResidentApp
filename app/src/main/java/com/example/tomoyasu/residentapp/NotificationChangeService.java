@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -74,8 +76,10 @@ public class NotificationChangeService extends Service implements SensorEventLis
     // 通知バーへの登録
     private void sendNotification() {
         // 登録するビルダーの初期設定
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
         builder.setSmallIcon(R.drawable.mono);
+        builder.setLargeIcon(largeIcon);
         builder.setContentTitle("Resident");
         builder.setContentText("Try put hand");
         builder.setTicker("Switch on!");

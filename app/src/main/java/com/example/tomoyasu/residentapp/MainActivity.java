@@ -71,6 +71,8 @@ public class MainActivity extends Activity {
 
         if (requestCode == 123 && resultCode == RESULT_OK) {
             Log.i(TAG, "Return:" + intent);
+            // リストから帰ってきたintentをmapに登録
+            NotificationChangeService.map.put("001", intent);
 
 //        Button btn = (Button)findViewById(R.id.TestButton);
 //        btn.setOnClickListener(new View.OnClickListener() {
