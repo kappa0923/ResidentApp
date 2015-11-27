@@ -113,11 +113,12 @@ public class NotificationChangeService extends Service implements SensorEventLis
                 onsw = false;
                 Log.i(TAG, "morse:" + morse);
 
+                // 入力されたモールスで振り分け
                 if (map.containsKey(morse)) {
                     Intent intent = map.get(morse);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                } else if (option.containsKey(morse)) {
+                } else if (option.get(morse).equals("HOME")) {
                     // HOMEボタンの呼び出し
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);

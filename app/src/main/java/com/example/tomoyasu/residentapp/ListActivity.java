@@ -65,6 +65,7 @@ public class ListActivity extends Activity {
         // リストビューにアプリケーションの一覧を表示する
         final ListView listView = new ListView(this);
         listView.setAdapter(new AppListAdapter(this, dataList));
+//        listView.setBackgroundColor(Color.parseColor("#55ACEE"));
         //クリック処理
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -121,6 +122,21 @@ public class ListActivity extends Activity {
             holder.textLabel.setText(data.label);
             holder.imageIcon.setImageDrawable(data.icon);
             holder.packageName.setText(data.pname);
+
+//            int listColor;
+//            switch (position%3) {
+//                case 0:
+//                    listColor = Color.parseColor("#e67e22");
+//                    break;
+//                case 1:
+//                    listColor = Color.parseColor("#2ecc71");
+//                    break;
+//                default:
+//                    listColor = Color.parseColor("#e74c3c");
+//                    break;
+//            }
+//
+//            convertView.setBackgroundColor(listColor);
 
             return convertView;
         }

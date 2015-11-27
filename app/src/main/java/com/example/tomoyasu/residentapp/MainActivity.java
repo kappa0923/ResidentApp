@@ -3,6 +3,7 @@ package com.example.tomoyasu.residentapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,13 +11,90 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+
 public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
+    public static HashMap<String, Intent> map = new HashMap<>();
+    public static HashMap<String, Intent> testmap = new HashMap<>();
+    public static HashMap<String, String> option = new HashMap<>();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        map.put("00", (new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"))));
+        //File file = new File(getDir("data", MODE_PRIVATE), "map");
+        // シリアライズ
+        SerializableData data = new SerializableData();
+        data.setMap(map);
+        try {
+            Log.i(TAG, "write map");
+            FileOutputStream fileOutputStream = openFileOutput("map.dat", MODE_PRIVATE);
+            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+            outputStream.writeObject(data);
+            outputStream.close();
+        } catch (Exception e) {
+            Log.d(TAG, "Error");
+        }
+
+        try {
+            Log.i(TAG, "OK");
+            FileInputStream fileInputStream = openFileInput("map.dat");
+            ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
+            SerializableData data1 = (SerializableData) inputStream.readObject();
+            testmap = data1.getMap();
+            Log.i(TAG, "intent:" + testmap.get("00"));
+            inputStream.close();
+        } catch (Exception e) {
+            Log.d(TAG, "Error1");
+        }
+
+        // HashMapの作成
+//        File map_file = new File("map.tmp");
+//        File option_file = new File("option.tmp");
+//        if (map_file.exists() && option_file.exists()) {
+//            try {
+//                Log.i(TAG, "File read");
+//                InputStream is = openFileInput("map.tmp");
+//                BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+//                String str,key,val;
+//                String[] sep;
+//                while((str = br.readLine()) != null) {
+//                    sep = str.split(",",0 );
+//                    map.put(sep[0], sep[1]);
+//                }
+//
+//
+//                ObjectInputStream inputStreamMap = new ObjectInputStream(new FileInputStream("map.tmp"));
+//                map = (HashMap)inputStreamMap.readObject();
+//                inputStreamMap.close();
+//                ObjectInputStream inputStreamOption = new ObjectInputStream(new FileInputStream("option.tmp"));
+//                option = (HashMap)inputStreamOption.readObject();
+//                inputStreamOption.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            try {
+//                Log.i(TAG, "File write");
+//                OutputStream os = openFileOutput("map.tmp", MODE_PRIVATE);
+//                PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+//                pw.write("00," + (new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"))) + "\n");
+//                pw.close();
+//                os = openFileOutput("option.tmp", MODE_PRIVATE);
+//                pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+//                pw.write("01,HOME");
+//                pw.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         // フォント取得
         Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
