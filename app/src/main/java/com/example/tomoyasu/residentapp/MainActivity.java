@@ -3,7 +3,6 @@ package com.example.tomoyasu.residentapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,49 +10,75 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
-    public static HashMap<String, Intent> map = new HashMap<>();
-    public static HashMap<String, Intent> testmap = new HashMap<>();
+    public static HashMap<String, String> map = new HashMap<>();
     public static HashMap<String, String> option = new HashMap<>();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        map.put("00", (new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"))));
-        //File file = new File(getDir("data", MODE_PRIVATE), "map");
-        // シリアライズ
-        SerializableData data = new SerializableData();
-        data.setMap(map);
-        try {
-            Log.i(TAG, "write map");
-            FileOutputStream fileOutputStream = openFileOutput("map.dat", MODE_PRIVATE);
-            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
-            outputStream.writeObject(data);
-            outputStream.close();
-        } catch (Exception e) {
-            Log.d(TAG, "Error");
-        }
+        map.put("00", "uri,https://www.google.co.jp/");
 
-        try {
-            Log.i(TAG, "OK");
-            FileInputStream fileInputStream = openFileInput("map.dat");
-            ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
-            SerializableData data1 = (SerializableData) inputStream.readObject();
-            testmap = data1.getMap();
-            Log.i(TAG, "intent:" + testmap.get("00"));
-            inputStream.close();
-        } catch (Exception e) {
-            Log.d(TAG, "Error1");
-        }
+        MapCreater.mapWrite(map);
+
+        map = MapCreater.mapRead();
+
+//        File file = new File("map.txt");
+//        if (!file.exists()) {
+//            try {
+//                FileWriter fileWriter = new FileWriter(file, false);
+//                fileWriter.write("00,uri,https://www.google.co.jp/\n");
+//                fileWriter.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        try {
+//            FileInputStream fileInputStream = openFileInput("map.txt");
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, "UTF-8"));
+//            String inputString = bufferedReader.readLine();
+//            while(inputString != null) {
+//                String[] separate = inputString.split(",", 0);
+//                map.put(separate[0], separate[1] + "," + separate[2]);
+//                inputString = bufferedReader.readLine();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        Log.i(TAG, map.get("00"));
+
+//        //File file = new File(getDir("data", MODE_PRIVATE), "map");
+//        // シリアライズ
+//        SerializableData data = new SerializableData();
+//        data.setMap(map);
+//        try {
+//            Log.i(TAG, "write map");
+//            FileOutputStream fileOutputStream = openFileOutput("map.dat", MODE_PRIVATE);
+//            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+//            outputStream.writeObject(data);
+//            outputStream.close();
+//        } catch (Exception e) {
+//            Log.d(TAG, "Error");
+//        }
+//
+//        try {
+//            Log.i(TAG, "OK");
+//            FileInputStream fileInputStream = openFileInput("map.dat");
+//            ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
+//            SerializableData data1 = (SerializableData) inputStream.readObject();
+//            testmap = data1.getMap();
+//            Log.i(TAG, "intent:" + testmap.get("00"));
+//            inputStream.close();
+//        } catch (Exception e) {
+//            Log.d(TAG, "Error1");
+//        }
 
         // HashMapの作成
 //        File map_file = new File("map.tmp");
