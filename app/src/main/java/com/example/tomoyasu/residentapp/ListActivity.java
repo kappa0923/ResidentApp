@@ -74,6 +74,7 @@ public class ListActivity extends Activity {
                 PackageManager pManager = getPackageManager();
                 Intent intent = pManager.getLaunchIntentForPackage(item.activityInfo.packageName);
                 // 一覧から取得したintentを元のactivityに返す
+                intent.putExtra("package", item.activityInfo.packageName);
                 setResult(RESULT_OK, intent);
                 Log.i(TAG, "item clicked:" + intent);
                 finish();

@@ -32,12 +32,10 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="2px"/>
 
-    <!--<Button-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@drawable/button"-->
-        <!--android:text="Test Button"-->
-        <!--android:id="@+id/TestButton"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_margin="10px"/>-->
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

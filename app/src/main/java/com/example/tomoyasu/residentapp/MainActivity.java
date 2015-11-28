@@ -1,14 +1,27 @@
 package com.example.tomoyasu.residentapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,7 +30,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends Activity {
     static final String TAG="LocalService";
@@ -67,6 +82,7 @@ public class MainActivity extends Activity {
         btn = (Button)findViewById(R.id.StopButton);
         btn.setOnClickListener(btnListener);
         btn.setTypeface(tf);
+
     }
 
     private View.OnClickListener btnListener = new View.OnClickListener() {
@@ -88,6 +104,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // Intentで呼び出したアプリから返ってきたら呼ばれる
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == 123 && resultCode == RESULT_OK) {
@@ -100,13 +117,8 @@ public class MainActivity extends Activity {
                 Log.i(TAG, entry.getKey() + ":" + entry.getValue());
             }
 
-//        Button btn = (Button)findViewById(R.id.TestButton);
-//        btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(intent);
-//            }
-//        });
+            mapWrite(map);
+
         }
     }
 
@@ -114,6 +126,51 @@ public class MainActivity extends Activity {
     public void onResume() {
         super.onResume();
         sw.setChecked(NotificationChangeService.state_Notifi);
+
+        // リストに一覧データを格納する
+        final List<AppData> dataList = new ArrayList<>();
+        for (HashMap.Entry<String,String> app : map.entrySet()) {
+            AppData data = new AppData();
+            String[] tmp = app.getValue().split(",");
+            Bitmap bitmap;
+            switch (tmp[0]) {
+                case "uri":
+                    data.label = app.getKey();
+                    data.pname = "link:" + tmp[1];
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "app":
+                    PackageManager packageManager = getPackageManager();
+                    try {
+                        data.label = app.getKey();
+                        data.pname = "app:" + tmp[1];
+                        data.icon = packageManager.getApplicationIcon(tmp[1]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "HOME":
+                    data.label = app.getKey();
+                    data.pname = "HOME KEY";
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+            }
+            dataList.add(data);
+        }
+
+        // リストビューを生成
+        final ListView listView = (ListView)findViewById(R.id.listView);
+        listView.setAdapter(new AppListAdapter(this, dataList));
+
+        //クリック処理
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
     }
 
     public void mapWrite(HashMap<String,String> map) {
@@ -151,6 +208,57 @@ public class MainActivity extends Activity {
         }
 
         return temp_map;
+    }
+
+    // アプリケーションデータ格納クラス
+    private static class AppData {
+        String label;
+        Drawable icon;
+        String pname;
+    }
+
+    // アプリケーションのラベルとアイコンを表示するためのアダプタークラス
+    private static class AppListAdapter extends ArrayAdapter<AppData> {
+
+        private final LayoutInflater mInflater;
+
+        public AppListAdapter(Context context, List<AppData> dataList) {
+            super(context, R.layout.activity_list);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            addAll(dataList);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder holder = new ViewHolder();
+
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.activity_list, parent, false);
+                holder.textLabel = (TextView) convertView.findViewById(R.id.label);
+                holder.imageIcon = (ImageView) convertView.findViewById(R.id.icon);
+                holder.packageName = (TextView) convertView.findViewById(R.id.pname);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            // 表示データを取得
+            final AppData data = getItem(position);
+            // ラベルとアイコンをリストビューに設定
+            holder.textLabel.setText(data.label);
+            holder.imageIcon.setImageDrawable(data.icon);
+            holder.packageName.setText(data.pname);
+
+            return convertView;
+        }
+    }
+
+    // ビューホルダー
+    private static class ViewHolder {
+        TextView textLabel;
+        ImageView imageIcon;
+        TextView packageName;
     }
 
 }
