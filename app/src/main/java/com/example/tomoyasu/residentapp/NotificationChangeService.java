@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -18,7 +19,6 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,8 +29,8 @@ public class NotificationChangeService extends Service implements SensorEventLis
 
     Handler countHandler;
     public static boolean state_Notifi; // Notificationの状態を監視
-    public static Map<String, Intent> map;
-    public static Map<String, String> option;
+    public static Map<String, String> map;
+//    public static Map<String, String> option;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
     private long startTime, endTime;
@@ -38,15 +38,15 @@ public class NotificationChangeService extends Service implements SensorEventLis
     public static String morse = "";
     private int borderTime = 400;
 
-    static {
-        map = new HashMap<>();
-        map.put("00", new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/")));
-        map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
-
-        option = new HashMap<>();
-        option.put("10", "HOME");
-        option.put("000", "CALL");
-    }
+//    static {
+//        map = new HashMap<>();
+//        map.put("00", new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/")));
+//        map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
+//
+//        option = new HashMap<>();
+//        option.put("10", "HOME");
+//        option.put("000", "CALL");
+//    }
 
     @Override
     public void onCreate() {
@@ -67,6 +67,9 @@ public class NotificationChangeService extends Service implements SensorEventLis
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
             Log.i(TAG, "sensorListener");
         }
+
+        // mapの初期化
+        map = MainActivity.map;
 
         // 非同期処理の開始
         countHandler = new Handler();
@@ -115,16 +118,48 @@ public class NotificationChangeService extends Service implements SensorEventLis
 
                 // 入力されたモールスで振り分け
                 if (map.containsKey(morse)) {
-                    Intent intent = map.get(morse);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                } else if (option.get(morse).equals("HOME")) {
-                    // HOMEボタンの呼び出し
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                    intent.addCategory(Intent.CATEGORY_HOME);
-                    startActivity(intent);
+                    String str = map.get(morse);
+                    String[] tmp = str.split(",");
+                    Intent intent;
+                    switch (tmp[0]) {
+                        case "uri":
+                            // URIを渡された
+                            Log.i(TAG, "uri");
+                            // リンク生成
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tmp[1]));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            break;
+                        case "app":
+                            // appを渡された
+                            Log.i(TAG, "app");
+                            // パッケージ名を基にインテントを生成
+                            PackageManager packageManager = getPackageManager();
+                            intent = packageManager.getLaunchIntentForPackage(tmp[1]);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            break;
+                        case "HOME":
+                            // HOMEを渡された
+                            Log.i(TAG, "home");
+                            // HOMEボタンを押下するアクション
+                            intent = new Intent(Intent.ACTION_MAIN);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            intent.addCategory(Intent.CATEGORY_HOME);
+                            startActivity(intent);
+                            break;
+                    }
+//                    Intent intent = map.get(morse);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
                 }
+//                else if (option.get(morse).equals("HOME")) {
+//                    // HOMEボタンの呼び出し
+//                    Intent intent = new Intent(Intent.ACTION_MAIN);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//                    intent.addCategory(Intent.CATEGORY_HOME);
+//                    startActivity(intent);
+//                }
 
 //                if (morse.equals("00")) {
 //                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
