@@ -31,7 +31,7 @@ public class callReceiver extends BroadcastReceiver {
     private class MyPhoneStateListener extends PhoneStateListener {
         public void onCallStateChanged(int state, String callNumber) {
             // NotificationがON、入力された信号がCALLを含む
-            if (NotificationChangeService.state_Notifi && NotificationChangeService.map.get(NotificationChangeService.morse).equals("CALL")) {
+            if (NotificationChangeService.state_Notifi && NotificationChangeService.map.get(NotificationChangeService.morse).equals("CALL,CALL")) {
                 // 電話が鳴っているか
                 if (state == TelephonyManager.CALL_STATE_RINGING) {
                     // 受話ボタンを押す

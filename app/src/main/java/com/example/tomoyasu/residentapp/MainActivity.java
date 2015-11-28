@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         if (!file.exists()) {
             // ファイルが存在しなかったら生成
             map.put("00", "uri,https://www.google.co.jp/");
-            map.put("000", "HOME");
+            map.put("000", "HOME,HOME");
             mapWrite(map);
         } else {
             // ファイルが存在したらロード
@@ -94,7 +94,6 @@ public class MainActivity extends Activity {
             Log.i(TAG, "Return:" + intent);
             // リストから帰ってきたintentをmapに登録
             String str = intent.getStringExtra("package");
-            map = mapRead();
             map.put("01", "app," + str);
 
             for (HashMap.Entry<String,String> entry : map.entrySet()) {
@@ -140,11 +139,13 @@ public class MainActivity extends Activity {
             InputStream inputStream = openFileInput("map.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String inputString = bufferedReader.readLine();
+            Log.i(TAG, "test3");
             while(inputString != null) {
                 String[] separate = inputString.split(",", 0);
                 temp_map.put(separate[0], separate[1] + "," + separate[2]);
                 inputString = bufferedReader.readLine();
             }
+            bufferedReader.close();
         } catch (Exception e) {
             Log.i(TAG,"Error2");
         }
