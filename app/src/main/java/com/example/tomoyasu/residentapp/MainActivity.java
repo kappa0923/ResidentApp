@@ -10,34 +10,116 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.HashMap;
 
 public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
-    public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
+    public static HashMap<String, String> map = new HashMap<>();
+    public static HashMap<String, String> option = new HashMap<>();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        File file = this.getFileStreamPath("map.txt");
-        if (!file.exists()) {
-            // ファイルが存在しなかったら生成
-            map.put("00", "uri,https://www.google.co.jp/");
-            map.put("000", "HOME");
-            mapWrite(map);
-        } else {
-            // ファイルが存在したらロード
-            map = mapRead();
-        }
+        map.put("00", "uri,https://www.google.co.jp/");
+
+        MapCreater.mapWrite(map);
+
+        map = MapCreater.mapRead();
+
+//        File file = new File("map.txt");
+//        if (!file.exists()) {
+//            try {
+//                FileWriter fileWriter = new FileWriter(file, false);
+//                fileWriter.write("00,uri,https://www.google.co.jp/\n");
+//                fileWriter.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        try {
+//            FileInputStream fileInputStream = openFileInput("map.txt");
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, "UTF-8"));
+//            String inputString = bufferedReader.readLine();
+//            while(inputString != null) {
+//                String[] separate = inputString.split(",", 0);
+//                map.put(separate[0], separate[1] + "," + separate[2]);
+//                inputString = bufferedReader.readLine();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        Log.i(TAG, map.get("00"));
+
+//        //File file = new File(getDir("data", MODE_PRIVATE), "map");
+//        // シリアライズ
+//        SerializableData data = new SerializableData();
+//        data.setMap(map);
+//        try {
+//            Log.i(TAG, "write map");
+//            FileOutputStream fileOutputStream = openFileOutput("map.dat", MODE_PRIVATE);
+//            ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+//            outputStream.writeObject(data);
+//            outputStream.close();
+//        } catch (Exception e) {
+//            Log.d(TAG, "Error");
+//        }
+//
+//        try {
+//            Log.i(TAG, "OK");
+//            FileInputStream fileInputStream = openFileInput("map.dat");
+//            ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
+//            SerializableData data1 = (SerializableData) inputStream.readObject();
+//            testmap = data1.getMap();
+//            Log.i(TAG, "intent:" + testmap.get("00"));
+//            inputStream.close();
+//        } catch (Exception e) {
+//            Log.d(TAG, "Error1");
+//        }
+
+        // HashMapの作成
+//        File map_file = new File("map.tmp");
+//        File option_file = new File("option.tmp");
+//        if (map_file.exists() && option_file.exists()) {
+//            try {
+//                Log.i(TAG, "File read");
+//                InputStream is = openFileInput("map.tmp");
+//                BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+//                String str,key,val;
+//                String[] sep;
+//                while((str = br.readLine()) != null) {
+//                    sep = str.split(",",0 );
+//                    map.put(sep[0], sep[1]);
+//                }
+//
+//
+//                ObjectInputStream inputStreamMap = new ObjectInputStream(new FileInputStream("map.tmp"));
+//                map = (HashMap)inputStreamMap.readObject();
+//                inputStreamMap.close();
+//                ObjectInputStream inputStreamOption = new ObjectInputStream(new FileInputStream("option.tmp"));
+//                option = (HashMap)inputStreamOption.readObject();
+//                inputStreamOption.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            try {
+//                Log.i(TAG, "File write");
+//                OutputStream os = openFileOutput("map.tmp", MODE_PRIVATE);
+//                PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+//                pw.write("00," + (new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"))) + "\n");
+//                pw.close();
+//                os = openFileOutput("option.tmp", MODE_PRIVATE);
+//                pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
+//                pw.write("01,HOME");
+//                pw.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         // フォント取得
         Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
@@ -93,13 +175,7 @@ public class MainActivity extends Activity {
         if (requestCode == 123 && resultCode == RESULT_OK) {
             Log.i(TAG, "Return:" + intent);
             // リストから帰ってきたintentをmapに登録
-            String str = intent.getStringExtra("package");
-            map = mapRead();
-            map.put("01", "app," + str);
-
-            for (HashMap.Entry<String,String> entry : map.entrySet()) {
-                Log.i(TAG, entry.getKey() + ":" + entry.getValue());
-            }
+            NotificationChangeService.map.put("001", intent);
 
 //        Button btn = (Button)findViewById(R.id.TestButton);
 //        btn.setOnClickListener(new View.OnClickListener() {
@@ -115,41 +191,6 @@ public class MainActivity extends Activity {
     public void onResume() {
         super.onResume();
         sw.setChecked(NotificationChangeService.state_Notifi);
-    }
-
-    public void mapWrite(HashMap<String,String> map) {
-        try {
-            Log.i(TAG,"test1");
-            // ファイルにmapを保存
-            OutputStream outputStream = openFileOutput("map.txt", MODE_PRIVATE);
-            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            for (HashMap.Entry<String,String> entry : map.entrySet()) {
-                printWriter.println(entry.getKey() + "," + entry.getValue());
-            }
-            printWriter.close();
-        } catch (Exception e) {
-            Log.i(TAG,"Error1");
-        }
-    }
-
-    public HashMap<String,String> mapRead() {
-        HashMap<String,String> temp_map = new HashMap<>();
-        try {
-            Log.i(TAG,"test2");
-            // ファイルからmapを読みだし
-            InputStream inputStream = openFileInput("map.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            String inputString = bufferedReader.readLine();
-            while(inputString != null) {
-                String[] separate = inputString.split(",", 0);
-                temp_map.put(separate[0], separate[1] + "," + separate[2]);
-                inputString = bufferedReader.readLine();
-            }
-        } catch (Exception e) {
-            Log.i(TAG,"Error2");
-        }
-
-        return temp_map;
     }
 
 }

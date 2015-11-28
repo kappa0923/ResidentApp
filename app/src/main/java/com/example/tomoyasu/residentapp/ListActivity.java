@@ -52,9 +52,20 @@ public class ListActivity extends Activity {
             dataList.add(data);
         }
 
+//        for (ApplicationInfo app : installedAppList) {
+//            // プリインアプリだったら飛ばす
+//            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) continue;
+//            AppData data = new AppData();
+//            data.label = app.loadLabel(pm).toString();
+//            data.icon = app.loadIcon(pm);
+//            data.pname = app.packageName;
+//            dataList.add(data);
+//        }
+
         // リストビューにアプリケーションの一覧を表示する
         final ListView listView = new ListView(this);
         listView.setAdapter(new AppListAdapter(this, dataList));
+//        listView.setBackgroundColor(Color.parseColor("#55ACEE"));
         //クリック処理
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,8 +73,6 @@ public class ListActivity extends Activity {
                 ResolveInfo item = appInfo.get(position);
                 PackageManager pManager = getPackageManager();
                 Intent intent = pManager.getLaunchIntentForPackage(item.activityInfo.packageName);
-                // 返すintentにパッケージ名を付加
-                intent.putExtra("package", item.activityInfo.packageName);
                 // 一覧から取得したintentを元のactivityに返す
                 setResult(RESULT_OK, intent);
                 Log.i(TAG, "item clicked:" + intent);
