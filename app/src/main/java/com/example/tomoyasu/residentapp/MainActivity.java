@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -38,10 +40,11 @@ public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
     public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
+    public static int mode = 0;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
 
         File file = this.getFileStreamPath("map.txt");
         if (!file.exists()) {
@@ -53,6 +56,139 @@ public class MainActivity extends Activity {
             // ファイルが存在したらロード
             map = mapRead();
         }
+
+        createMain();
+
+        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.morseLayout);
+        linearLayout.addView(new MorseView(this));
+
+//        // フォント取得
+//        Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
+//
+//        // トグルスイッチ
+//        sw = (Switch)findViewById(R.id.SwitchButton);
+//        sw.setChecked(NotificationChangeService.state_Notifi);
+//        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked) {
+//                    Log.i(TAG, "Switch On");
+//                    startService(new Intent(MainActivity.this, NotificationChangeService.class));
+//                } else {
+//                    Log.i(TAG, "Switch Off");
+//                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
+//                }
+//            }
+//        });
+//        sw.setTypeface(tf);
+//
+//        // 各ボタンの設定
+//        Button btn = (Button)findViewById(R.id.StartButton);
+//        btn.setOnClickListener(btnListener);
+//        btn.setTypeface(tf);
+//
+//        btn = (Button)findViewById(R.id.StopButton);
+//        btn.setOnClickListener(btnListener);
+//        btn.setTypeface(tf);
+
+    }
+
+    private View.OnClickListener btnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()) {
+                case R.id.StartButton:
+                    Log.i(TAG, "Start Button");
+                    Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                    intent.setAction(Intent.ACTION_PICK);
+                    startActivityForResult(intent, 123);
+                    break;
+                case R.id.StopButton:
+                    Log.i(TAG, "Stop Button");
+                    mode = 1;
+                    setContentView(R.layout.activity_morse);
+
+//                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
+                    break;
+            }
+        }
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // Intentで呼び出したアプリから返ってきたら呼ばれる
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == 123 && resultCode == RESULT_OK) {
+            Log.i(TAG, "Return:" + intent);
+            // リストから帰ってきたintentをmapに登録
+            String str = intent.getStringExtra("package");
+            map.put("01", "app," + str);
+
+            for (HashMap.Entry<String,String> entry : map.entrySet()) {
+                Log.i(TAG, entry.getKey() + ":" + entry.getValue());
+            }
+
+            mapWrite(map);
+
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        createMain();
+//        sw.setChecked(NotificationChangeService.state_Notifi);
+//
+//        // リストに一覧データを格納する
+//        final List<AppData> dataList = new ArrayList<>();
+//        for (HashMap.Entry<String,String> app : map.entrySet()) {
+//            AppData data = new AppData();
+//            String[] tmp = app.getValue().split(",");
+//            Bitmap bitmap;
+//            switch (tmp[0]) {
+//                case "uri":
+//                    data.label = app.getKey();
+//                    data.pname = "link:" + tmp[1];
+//                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
+//                    data.icon = new BitmapDrawable(getResources(), bitmap);
+//                    break;
+//                case "app":
+//                    PackageManager packageManager = getPackageManager();
+//                    try {
+//                        data.label = app.getKey();
+//                        data.pname = "app:" + tmp[1];
+//                        data.icon = packageManager.getApplicationIcon(tmp[1]);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    break;
+//                case "HOME":
+//                    data.label = app.getKey();
+//                    data.pname = "HOME KEY";
+//                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+//                    data.icon = new BitmapDrawable(getResources(), bitmap);
+//                    break;
+//            }
+//            dataList.add(data);
+//        }
+//
+//        // リストビューを生成
+//        final ListView listView = (ListView)findViewById(R.id.listView);
+//        listView.setAdapter(new AppListAdapter(this, dataList));
+//
+//        //クリック処理
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//            }
+//        });
+    }
+
+    public void createMain() {
+        setContentView(R.layout.activity_main);
 
         // フォント取得
         Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
@@ -83,48 +219,6 @@ public class MainActivity extends Activity {
         btn.setOnClickListener(btnListener);
         btn.setTypeface(tf);
 
-    }
-
-    private View.OnClickListener btnListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch(v.getId()) {
-                case R.id.StartButton:
-                    Log.i(TAG, "Start Button");
-                    Intent intent = new Intent(MainActivity.this, ListActivity.class);
-                    intent.setAction(Intent.ACTION_PICK);
-                    startActivityForResult(intent, 123);
-                    break;
-                case R.id.StopButton:
-                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
-                    break;
-            }
-        }
-    };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        // Intentで呼び出したアプリから返ってきたら呼ばれる
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        if (requestCode == 123 && resultCode == RESULT_OK) {
-            Log.i(TAG, "Return:" + intent);
-            // リストから帰ってきたintentをmapに登録
-            String str = intent.getStringExtra("package");
-            map.put("01", "app," + str);
-
-            for (HashMap.Entry<String,String> entry : map.entrySet()) {
-                Log.i(TAG, entry.getKey() + ":" + entry.getValue());
-            }
-
-            mapWrite(map);
-
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         sw.setChecked(NotificationChangeService.state_Notifi);
 
         // リストに一覧データを格納する
@@ -259,6 +353,24 @@ public class MainActivity extends Activity {
         TextView textLabel;
         ImageView imageIcon;
         TextView packageName;
+    }
+
+    @Override
+    public  boolean onKeyDown(int keyCode, KeyEvent e) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            switch (mode) {
+                case 1:
+                    mode = 0;
+                    createMain();
+                    break;
+                default:
+                    finish();
+                    break;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
