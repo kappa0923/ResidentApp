@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,11 +26,13 @@ import java.util.List;
  */
 public class ListActivity extends Activity {
     public final String TAG = "LocalService";
+    public static Typeface typeface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        typeface = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
 
         Log.i(TAG, "List Create");
 
@@ -52,20 +55,10 @@ public class ListActivity extends Activity {
             dataList.add(data);
         }
 
-//        for (ApplicationInfo app : installedAppList) {
-//            // プリインアプリだったら飛ばす
-//            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) continue;
-//            AppData data = new AppData();
-//            data.label = app.loadLabel(pm).toString();
-//            data.icon = app.loadIcon(pm);
-//            data.pname = app.packageName;
-//            dataList.add(data);
-//        }
-
         // リストビューにアプリケーションの一覧を表示する
         final ListView listView = new ListView(this);
         listView.setAdapter(new AppListAdapter(this, dataList));
-//        listView.setBackgroundColor(Color.parseColor("#55ACEE"));
+
         //クリック処理
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -78,7 +71,6 @@ public class ListActivity extends Activity {
                 setResult(RESULT_OK, intent);
                 Log.i(TAG, "item clicked:" + intent);
                 finish();
-//                startActivity(intent);
             }
         });
         setContentView(listView);
@@ -120,9 +112,12 @@ public class ListActivity extends Activity {
             // 表示データを取得
             final AppData data = getItem(position);
             // ラベルとアイコンをリストビューに設定
+            holder.textLabel.setTypeface(typeface);
+            holder.packageName.setTypeface(typeface);
             holder.textLabel.setText(data.label);
             holder.imageIcon.setImageDrawable(data.icon);
             holder.packageName.setText(data.pname);
+
 
 //            int listColor;
 //            switch (position%3) {

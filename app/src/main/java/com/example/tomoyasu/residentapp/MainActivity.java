@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
     public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
+    public static Typeface tf;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,47 +47,17 @@ public class MainActivity extends Activity {
         File file = this.getFileStreamPath("map.txt");
         if (!file.exists()) {
             // ファイルが存在しなかったら生成
-            map.put("00", "uri,https://www.google.co.jp/");
-            map.put("000", "HOME,HOME");
+            map.put("・・", "uri,https://www.google.co.jp/");
+            map.put("・・・", "HOME,HOME");
             mapWrite(map);
         } else {
             // ファイルが存在したらロード
             map = mapRead();
         }
 
+        tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
+
         createMain();
-
-//        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.morseLayout);
-//        linearLayout.addView(new MorseView(this));
-
-//        // フォント取得
-//        Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
-//
-//        // トグルスイッチ
-//        sw = (Switch)findViewById(R.id.SwitchButton);
-//        sw.setChecked(NotificationChangeService.state_Notifi);
-//        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    Log.i(TAG, "Switch On");
-//                    startService(new Intent(MainActivity.this, NotificationChangeService.class));
-//                } else {
-//                    Log.i(TAG, "Switch Off");
-//                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
-//                }
-//            }
-//        });
-//        sw.setTypeface(tf);
-//
-//        // 各ボタンの設定
-//        Button btn = (Button)findViewById(R.id.StartButton);
-//        btn.setOnClickListener(btnListener);
-//        btn.setTypeface(tf);
-//
-//        btn = (Button)findViewById(R.id.StopButton);
-//        btn.setOnClickListener(btnListener);
-//        btn.setTypeface(tf);
 
     }
 
@@ -120,7 +91,7 @@ public class MainActivity extends Activity {
             Log.i(TAG, "Return:" + intent);
             // リストから帰ってきたintentをmapに登録
             String str = intent.getStringExtra("package");
-            map.put("01", "app," + str);
+            map.put("・－", "app," + str);
 
             for (HashMap.Entry<String,String> entry : map.entrySet()) {
                 Log.i(TAG, entry.getKey() + ":" + entry.getValue());
@@ -188,9 +159,6 @@ public class MainActivity extends Activity {
 
     public void createMain() {
         setContentView(R.layout.activity_main);
-
-        // フォント取得
-        Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
 
         // トグルスイッチ
         sw = (Switch)findViewById(R.id.SwitchButton);
@@ -268,7 +236,7 @@ public class MainActivity extends Activity {
 
     public void mapWrite(HashMap<String,String> map) {
         try {
-            Log.i(TAG,"test1");
+            Log.i(TAG,"map write");
             // ファイルにmapを保存
             OutputStream outputStream = openFileOutput("map.txt", MODE_PRIVATE);
             PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"));
@@ -277,19 +245,18 @@ public class MainActivity extends Activity {
             }
             printWriter.close();
         } catch (Exception e) {
-            Log.i(TAG,"Error1");
+            Log.i(TAG,"map write error");
         }
     }
 
     public HashMap<String,String> mapRead() {
         HashMap<String,String> temp_map = new HashMap<>();
         try {
-            Log.i(TAG,"test2");
+            Log.i(TAG,"map load");
             // ファイルからmapを読みだし
             InputStream inputStream = openFileInput("map.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String inputString = bufferedReader.readLine();
-            Log.i(TAG, "test3");
             while(inputString != null) {
                 String[] separate = inputString.split(",", 0);
                 temp_map.put(separate[0], separate[1] + "," + separate[2]);
@@ -297,7 +264,7 @@ public class MainActivity extends Activity {
             }
             bufferedReader.close();
         } catch (Exception e) {
-            Log.i(TAG,"Error2");
+            Log.i(TAG,"map load error");
         }
 
         return temp_map;
@@ -339,6 +306,8 @@ public class MainActivity extends Activity {
             // 表示データを取得
             final AppData data = getItem(position);
             // ラベルとアイコンをリストビューに設定
+            holder.textLabel.setTypeface(tf);
+            holder.packageName.setTypeface(tf);
             holder.textLabel.setText(data.label);
             holder.imageIcon.setImageDrawable(data.icon);
             holder.packageName.setText(data.pname);

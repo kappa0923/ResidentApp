@@ -12,27 +12,80 @@
         android:id="@+id/waveView"
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:layout_weight="0.8"
+        android:layout_weight="0.7"
         />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:text="New Text"
+        android:text="Sign"
         android:id="@+id/morseText"
         android:gravity="center"
         android:layout_gravity="bottom"
         android:layout_weight="0.1"
-        android:textSize="25sp"
+        android:textSize="18pt"
         />
 
-    <Button
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:text="Next Button"
-        android:id="@+id/NextButton"
-        android:gravity="center"
+        android:layout_height="0dp"
+        android:id="@+id/horizontalScrollView"
         android:layout_gravity="bottom"
-        android:layout_weight="0.1"
-        />
+        android:layout_weight="0.2" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <Button
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:layout_margin="6dp"
+                android:padding="10dp"
+                android:id="@+id/appButton"
+                android:gravity="bottom|center_horizontal"
+                android:text="app"
+                android:drawableTop="@drawable/rocket"
+                android:background="@drawable/button_items"
+                />
+            <Button
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:layout_margin="6dp"
+                android:padding="10dp"
+                android:id="@+id/webButton"
+                android:gravity="bottom|center_horizontal"
+                android:text="web"
+                android:drawableTop="@drawable/net"
+                android:background="@drawable/button_items"
+            />
+            <Button
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:layout_margin="6dp"
+                android:padding="10dp"
+                android:id="@+id/homeButton"
+                android:gravity="bottom|center_horizontal"
+                android:text="home"
+                android:drawableTop="@drawable/home"
+                android:background="@drawable/button_items"
+                />
+            <Button
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:layout_margin="6dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="13dp"
+                android:id="@+id/phoneButton"
+                android:gravity="bottom|center_horizontal"
+                android:text="catch phone"
+                android:textSize="4pt"
+                android:drawableTop="@drawable/phone"
+                android:background="@drawable/button_items"
+                />
+        </LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

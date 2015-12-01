@@ -157,6 +157,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
         // 死ぬときに呼ばれる
         super.onDestroy();
         Log.i(TAG, "onDestroy");
+        Toast.makeText(this, "MyService#onDestroy", Toast.LENGTH_SHORT).show();
         state_Notifi = false;
 
         // ハンドラの開放
