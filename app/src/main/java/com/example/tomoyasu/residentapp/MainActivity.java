@@ -11,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -40,7 +38,6 @@ public class MainActivity extends Activity {
     static final String TAG="LocalService";
     private Switch sw;
     public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
-    public static int mode = 0;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +56,8 @@ public class MainActivity extends Activity {
 
         createMain();
 
-        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.morseLayout);
-        linearLayout.addView(new MorseView(this));
+//        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.morseLayout);
+//        linearLayout.addView(new MorseView(this));
 
 //        // フォント取得
 //        Typeface tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
@@ -101,13 +98,13 @@ public class MainActivity extends Activity {
                     Log.i(TAG, "Start Button");
                     Intent intent = new Intent(MainActivity.this, ListActivity.class);
                     intent.setAction(Intent.ACTION_PICK);
-                    startActivityForResult(intent, 123);
+                    startActivityForResult(intent, 1);
                     break;
                 case R.id.StopButton:
                     Log.i(TAG, "Stop Button");
-                    mode = 1;
-                    setContentView(R.layout.activity_morse);
-
+                    Intent intent1 = new Intent(MainActivity.this, MorseActivity.class);
+                    intent1.setAction(Intent.ACTION_PICK);
+                    startActivityForResult(intent1, 2);
 //                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
                     break;
             }
@@ -119,7 +116,7 @@ public class MainActivity extends Activity {
         // Intentで呼び出したアプリから返ってきたら呼ばれる
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == 123 && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             Log.i(TAG, "Return:" + intent);
             // リストから帰ってきたintentをmapに登録
             String str = intent.getStringExtra("package");
@@ -128,9 +125,11 @@ public class MainActivity extends Activity {
             for (HashMap.Entry<String,String> entry : map.entrySet()) {
                 Log.i(TAG, entry.getKey() + ":" + entry.getValue());
             }
-
             mapWrite(map);
+        }
 
+        if (requestCode == 2 && resultCode == RESULT_OK) {
+            Log.i(TAG, "Return:" + intent);
         }
     }
 
@@ -353,24 +352,6 @@ public class MainActivity extends Activity {
         TextView textLabel;
         ImageView imageIcon;
         TextView packageName;
-    }
-
-    @Override
-    public  boolean onKeyDown(int keyCode, KeyEvent e) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            switch (mode) {
-                case 1:
-                    mode = 0;
-                    createMain();
-                    break;
-                default:
-                    finish();
-                    break;
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }

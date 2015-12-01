@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ListActivity" />
+        <activity android:name=".MorseActivity"/>
         <service android:name=".NotificationChangeService" />
         <receiver android:name=".callReceiver">
             <intent-filter>
