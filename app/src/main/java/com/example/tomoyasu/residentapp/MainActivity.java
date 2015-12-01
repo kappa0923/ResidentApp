@@ -70,12 +70,18 @@ public class MainActivity extends Activity {
                     Intent intent = new Intent(MainActivity.this, ListActivity.class);
                     intent.setAction(Intent.ACTION_PICK);
                     startActivityForResult(intent, 1);
+                    // アニメーションの設定
+                    overridePendingTransition(R.anim.in_right, R.anim.out_left);
                     break;
                 case R.id.StopButton:
                     Log.i(TAG, "Stop Button");
                     Intent intent1 = new Intent(MainActivity.this, MorseActivity.class);
                     intent1.setAction(Intent.ACTION_PICK);
                     startActivityForResult(intent1, 2);
+                    // アニメーションの設定
+                    overridePendingTransition(R.anim.in_right, R.anim.out_left);
+
+                    // サービスの停止
 //                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
                     break;
             }

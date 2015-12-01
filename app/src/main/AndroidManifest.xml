@@ -16,8 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListActivity" />
-        <activity android:name=".MorseActivity"/>
+        <activity android:name=".ListActivity" android:launchMode="singleTop"/>
+        <activity android:name=".MorseActivity" android:launchMode="singleTop"/>
         <service android:name=".NotificationChangeService" />
         <receiver android:name=".callReceiver">
             <intent-filter>

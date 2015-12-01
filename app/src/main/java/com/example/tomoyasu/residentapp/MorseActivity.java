@@ -104,6 +104,19 @@ public class MorseActivity extends Activity implements SensorEventListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // アニメーションの設定
+        overridePendingTransition(R.anim.in_left, R.anim.out_right);
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
 
