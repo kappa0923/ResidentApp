@@ -107,7 +107,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (requestCode == 2 && resultCode == RESULT_OK) {
-            Log.i(TAG, "Return:" + intent);
+            String hoge = intent.getStringExtra("morse");
+            String fuga = intent.getStringExtra("package");
+            Log.i(TAG, "Return:" + hoge + "," + fuga);
+            // リストから返ってきたintentをmapに登録
+            map.put(hoge, fuga);
+
+            mapWrite(map);
         }
     }
 

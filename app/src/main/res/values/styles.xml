@@ -5,17 +5,6 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green</item>
-        <!--<item name="actionBarStyle">@style/actionBar</item>-->
-        <!--<item name="android:actionBarStyle">@style/actionBar</item>-->
-    <!--</style>-->
-    <!--<style name="actionBar" parent="@android:style/Widget.Holo.Light.ActionBar">-->
-        <!--<item name="android:background">@color/green</item>-->
-        <!--<item name="android:backgroundStacked">@color/green</item>-->
-        <!--<item name="android:backgroundSplit">@color/green</item>-->
-
-        <!--<item name="background">@color/green</item>-->
-        <!--<item name="backgroundStacked">@color/green</item>-->
-        <!--<item name="backgroundSplit">@color/green</item>-->
     </style>
 
 </resources>

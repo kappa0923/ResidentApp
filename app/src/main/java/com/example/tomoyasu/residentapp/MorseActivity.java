@@ -1,7 +1,8 @@
 package com.example.tomoyasu.residentapp;
 
-import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
@@ -10,9 +11,15 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,7 +28,7 @@ import java.util.List;
 /**
  * Created by Tomoyasu on 2015/11/30.
  */
-public class MorseActivity extends Activity implements SensorEventListener {
+public class MorseActivity extends AppCompatActivity implements SensorEventListener {
     private String TAG = "LocalService";
 
     Handler countHandler;
@@ -30,9 +37,13 @@ public class MorseActivity extends Activity implements SensorEventListener {
     private long startTime, endTime;
     private boolean onsw = false;
     public static String morse = "";
+    public static String uri = "";
     private int borderTime = 400;
     private Typeface tf;
     private View view;
+    private Dialog dialog;
+    private int view_width;
+    private Intent intent;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -40,9 +51,31 @@ public class MorseActivity extends Activity implements SensorEventListener {
 
         setContentView(R.layout.activity_morse);
 
+        intent = getIntent();
+
+        // 画面幅を取得
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        view_width = metrics.widthPixels;
+
         // フォントの読み込み
         tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
 
+        // ツールバー
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationIcon(R.drawable.arrow_back);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            TextView textView = (TextView)findViewById(R.id.toolbar_title);
+            textView.setTypeface(tf);
+        }
+
+        // モールス信号表示ビュー
         TextView textView = (TextView)findViewById(R.id.morseText);
         textView.setTypeface(tf);
 
@@ -62,9 +95,63 @@ public class MorseActivity extends Activity implements SensorEventListener {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog = new Dialog(MorseActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog);
 
+                // windowサイズを取得
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.width = view_width;
+                dialog.getWindow().setAttributes(lp);
+
+                // dialogの要素
+                TextView textView1 = (TextView)dialog.findViewById(R.id.dialog_title);
+                textView1.setTypeface(tf);
+
+                textView1 = (TextView)dialog.findViewById(R.id.dialog_text);
+                textView1.setTypeface(tf);
+
+                textView1 = (TextView)dialog.findViewById(R.id.dialog_morse);
+                textView1.setText(morse);
+                textView1.setTypeface(tf);
+
+                final EditText editText =(EditText)dialog.findViewById(R.id.editText);
+
+                // Dialog cancel button
+                Button button1 = (Button)dialog.findViewById(R.id.button_cancel);
+                button1.setTypeface(tf);
+                button1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Dialog CANCEL");
+
+                        dialog.dismiss();
+                    }
+                });
+
+                // Dialog OK button
+                button1 = (Button)dialog.findViewById(R.id.button_ok);
+                button1.setTypeface(tf);
+                button1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Dialog OK");
+                        // OKタップ時の返すintent
+                        uri = editText.getText().toString();
+                        intent.putExtra("morse", morse);
+                        intent.putExtra("package", "uri," + uri);
+                        setResult(RESULT_OK, intent);
+
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+                dialog.show();
             }
         });
+
+
 
         // ホームボタンの追加
         button = (Button)findViewById(R.id.homeButton);

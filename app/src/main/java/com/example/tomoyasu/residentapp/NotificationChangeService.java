@@ -18,6 +18,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +32,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
 
     Handler countHandler;
     public static boolean state_Notifi; // Notificationの状態を監視
-    public static Map<String, Intent> map;
+    public static Map<String, String> map = new HashMap<>();
     public static Map<String, String> option;
     private static int NOTIFICATION_ID = R.layout.activity_main;
     private float proximity;
@@ -38,20 +41,28 @@ public class NotificationChangeService extends Service implements SensorEventLis
     public static String morse = "";
     private int borderTime = 400;
 
-    static {
-        map = new HashMap<>();
-        map.put("00", new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/")));
-        map.put("01", new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com/")));
-
-        option = new HashMap<>();
-        option.put("10", "HOME");
-        option.put("000", "CALL");
-    }
-
     @Override
     public void onCreate() {
         // 初回起動時のみ呼ばれる
         super.onCreate();
+
+        // mapへ読み込み
+        try {
+            Log.i(TAG,"map load");
+            // ファイルからmapを読みだし
+            InputStream inputStream = openFileInput("map.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            String inputString = bufferedReader.readLine();
+            while(inputString != null) {
+                String[] separate = inputString.split(",", 0);
+                map.put(separate[0], separate[1] + "," + separate[2]);
+                inputString = bufferedReader.readLine();
+            }
+            bufferedReader.close();
+        } catch (Exception e) {
+            Log.i(TAG,"map load error");
+        }
+
         // 画面内に通知
         Log.i(TAG, "onCreate");
         Toast.makeText(this, "MyService#onCreate", Toast.LENGTH_SHORT).show();
@@ -114,17 +125,39 @@ public class NotificationChangeService extends Service implements SensorEventLis
                 Log.i(TAG, "morse:" + morse);
 
                 // 入力されたモールスで振り分け
-                if (map.containsKey(morse)) {
-                    Intent intent = map.get(morse);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                } else if (option.get(morse).equals("HOME")) {
-                    // HOMEボタンの呼び出し
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                    intent.addCategory(Intent.CATEGORY_HOME);
-                    startActivity(intent);
+                String[] tmp = map.get(morse).split(",");
+                Intent intent;
+                switch (tmp[0]) {
+                    case "uri":
+                        // URL
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tmp[1]));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        break;
+                    case "app":
+                        // アプリケーション
+                        break;
+                    case "HOME":
+                         // HOMEボタンの呼び出し
+                        intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        startActivity(intent);
+                        break;
                 }
+
+
+//                if (map.containsKey(morse)) {
+//                    Intent intent = map.get(morse);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                } else if (option.get(morse).equals("HOME")) {
+//                    // HOMEボタンの呼び出し
+//                    Intent intent = new Intent(Intent.ACTION_MAIN);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//                    intent.addCategory(Intent.CATEGORY_HOME);
+//                    startActivity(intent);
+//                }
 
 //                if (morse.equals("00")) {
 //                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://techbooster.org/"));
@@ -193,8 +226,8 @@ public class NotificationChangeService extends Service implements SensorEventLis
                 endTime = System.currentTimeMillis();
 
                 // モールス信号の判別
-                if ( (endTime - startTime) <= borderTime) morse = morse + "0";
-                else morse = morse + "1";
+                if ( (endTime - startTime) <= borderTime) morse = morse + "・";
+                else morse = morse + "－";
             }
         }
     }
