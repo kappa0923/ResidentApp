@@ -1,6 +1,5 @@
 package com.example.tomoyasu.residentapp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +9,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +22,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -34,9 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     static final String TAG="LocalService";
-    private Switch sw;
+    private SwitchCompat sw;
     public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
     public static Typeface tf;
 
@@ -166,8 +167,19 @@ public class MainActivity extends Activity {
     public void createMain() {
         setContentView(R.layout.activity_main);
 
+        // ツールバー
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationIcon(R.mipmap.ic_launcher);
+            TextView textView = (TextView)findViewById(R.id.toolbar_title);
+            textView.setTypeface(tf);
+        }
+
         // トグルスイッチ
-        sw = (Switch)findViewById(R.id.SwitchButton);
+        TextView textView = (TextView)findViewById(R.id.switch_text);
+        textView.setTypeface(tf);
+        sw = (SwitchCompat)findViewById(R.id.SwitchButton);
         sw.setChecked(NotificationChangeService.state_Notifi);
         sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -181,7 +193,6 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        sw.setTypeface(tf);
 
         // 各ボタンの設定
         Button btn = (Button)findViewById(R.id.StartButton);
