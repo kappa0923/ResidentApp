@@ -78,7 +78,7 @@
                 android:layout_weight="0.3"
                 android:layout_margin="6dp"
                 android:paddingTop="10dp"
-                android:paddingBottom="6dp"
+                android:paddingBottom="4dp"
                 android:id="@+id/phoneButton"
                 android:gravity="bottom|center_horizontal"
                 android:text="catch\nphone"
