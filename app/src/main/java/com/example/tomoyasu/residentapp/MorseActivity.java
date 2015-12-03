@@ -86,7 +86,11 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         appButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                intent = new Intent(MorseActivity.this, ListActivity.class);
+                intent.setAction(Intent.ACTION_PICK);
+                startActivityForResult(intent, 1);
+                // アニメーションの設定
+                overridePendingTransition(R.anim.in_right, R.anim.out_left);
             }
         });
 
@@ -220,6 +224,20 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         // センサーの開放
         SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Log.i(TAG, "MorseActivity:" + intent);
+            String hoge = intent.getStringExtra("package");
+            intent.putExtra("morse", morse);
+            intent.putExtra("package", "app," + hoge);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
     @Override

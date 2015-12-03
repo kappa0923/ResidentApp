@@ -76,6 +76,14 @@ public class ListActivity extends Activity {
         setContentView(listView);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // アニメーションの設定
+        overridePendingTransition(R.anim.in_left, R.anim.out_right);
+    }
+
     // アプリケーションデータ格納クラス
     private static class AppData {
         String label;
