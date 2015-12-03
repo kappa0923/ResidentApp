@@ -44,6 +44,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
     private Dialog dialog;
     private int view_width;
     private Intent intent;
+    private Button webButton, appButton, homeButton, phoneButton;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -80,9 +81,9 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         textView.setTypeface(tf);
 
         // アプリ追加ボタン
-        Button button = (Button)findViewById(R.id.appButton);
-        button.setTypeface(tf);
-        button.setOnClickListener(new View.OnClickListener() {
+        appButton = (Button)findViewById(R.id.appButton);
+        appButton.setTypeface(tf);
+        appButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -90,9 +91,9 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         });
 
         // webショートカット追加ボタン
-        button = (Button)findViewById(R.id.webButton);
-        button.setTypeface(tf);
-        button.setOnClickListener(new View.OnClickListener() {
+        webButton = (Button)findViewById(R.id.webButton);
+        webButton.setTypeface(tf);
+        webButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog = new Dialog(MorseActivity.this);
@@ -105,22 +106,22 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 dialog.getWindow().setAttributes(lp);
 
                 // dialogの要素
-                TextView textView1 = (TextView)dialog.findViewById(R.id.dialog_title);
+                TextView textView1 = (TextView) dialog.findViewById(R.id.dialog_title);
                 textView1.setTypeface(tf);
 
-                textView1 = (TextView)dialog.findViewById(R.id.dialog_text);
+                textView1 = (TextView) dialog.findViewById(R.id.dialog_text);
                 textView1.setTypeface(tf);
 
-                textView1 = (TextView)dialog.findViewById(R.id.dialog_morse);
+                textView1 = (TextView) dialog.findViewById(R.id.dialog_morse);
                 textView1.setText(morse);
                 textView1.setTypeface(tf);
 
-                final EditText editText =(EditText)dialog.findViewById(R.id.editText);
+                final EditText editText = (EditText) dialog.findViewById(R.id.editText);
 
                 // Dialog cancel button
-                Button button1 = (Button)dialog.findViewById(R.id.button_cancel);
-                button1.setTypeface(tf);
-                button1.setOnClickListener(new View.OnClickListener() {
+                Button button = (Button) dialog.findViewById(R.id.button_cancel);
+                button.setTypeface(tf);
+                button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Log.i(TAG, "Dialog CANCEL");
@@ -130,20 +131,22 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 });
 
                 // Dialog OK button
-                button1 = (Button)dialog.findViewById(R.id.button_ok);
-                button1.setTypeface(tf);
-                button1.setOnClickListener(new View.OnClickListener() {
+                button = (Button) dialog.findViewById(R.id.button_ok);
+                button.setTypeface(tf);
+                button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Log.i(TAG, "Dialog OK");
-                        // OKタップ時の返すintent
-                        uri = editText.getText().toString();
-                        intent.putExtra("morse", morse);
-                        intent.putExtra("package", "uri," + uri);
-                        setResult(RESULT_OK, intent);
+                        if (!editText.getText().toString().equals("")) {
+                            // OKタップ時の返すintent
+                            uri = editText.getText().toString();
+                            intent.putExtra("morse", morse);
+                            intent.putExtra("package", "uri," + uri);
+                            setResult(RESULT_OK, intent);
 
-                        dialog.dismiss();
-                        finish();
+                            dialog.dismiss();
+                            finish();
+                        }
                     }
                 });
 
@@ -154,9 +157,9 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
 
 
         // ホームボタンの追加
-        button = (Button)findViewById(R.id.homeButton);
-        button.setTypeface(tf);
-        button.setOnClickListener(new View.OnClickListener() {
+        homeButton = (Button)findViewById(R.id.homeButton);
+        homeButton.setTypeface(tf);
+        homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -164,9 +167,9 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         });
 
         // 通話ボタンの追加
-        button = (Button)findViewById(R.id.phoneButton);
-        button.setTypeface(tf);
-        button.setOnClickListener(new View.OnClickListener() {
+        phoneButton = (Button)findViewById(R.id.phoneButton);
+        phoneButton.setTypeface(tf);
+        phoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -278,8 +281,19 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 if (MainActivity.map.containsKey(morse)) {
                     // モールス信号が登録済み
                     MorseView.errorMsg = "登録済みの信号です";
+                    // 各ボタンを無効化
+                    appButton.setEnabled(false);
+                    webButton.setEnabled(false);
+                    homeButton.setEnabled(false);
+                    phoneButton.setEnabled(false);
                 } else {
+                    // モールス信号が登録可
                     MorseView.errorMsg = "登録可能の信号です";
+                    // 各ボタンを有効化
+                    appButton.setEnabled(true);
+                    webButton.setEnabled(true);
+                    homeButton.setEnabled(true);
+                    phoneButton.setEnabled(true);
                 }
             }
 

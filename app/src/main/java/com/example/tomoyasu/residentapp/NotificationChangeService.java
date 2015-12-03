@@ -124,26 +124,29 @@ public class NotificationChangeService extends Service implements SensorEventLis
                 onsw = false;
                 Log.i(TAG, "morse:" + morse);
 
-                // 入力されたモールスで振り分け
-                String[] tmp = map.get(morse).split(",");
-                Intent intent;
-                switch (tmp[0]) {
-                    case "uri":
-                        // URL
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tmp[1]));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        break;
-                    case "app":
-                        // アプリケーション
-                        break;
-                    case "HOME":
-                         // HOMEボタンの呼び出し
-                        intent = new Intent(Intent.ACTION_MAIN);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                        intent.addCategory(Intent.CATEGORY_HOME);
-                        startActivity(intent);
-                        break;
+                if (map.containsKey(morse)) {
+                    // 入力されたモールスで振り分け
+                    String[] tmp = map.get(morse).split(",");
+                    Intent intent;
+                    switch (tmp[0]) {
+                        case "uri":
+                            // URL
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tmp[1]));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            break;
+                        case "app":
+                            // アプリケーション
+                            break;
+                        case "HOME":
+                            // HOMEボタンの呼び出し
+                            intent = new Intent(Intent.ACTION_MAIN);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            intent.addCategory(Intent.CATEGORY_HOME);
+                            startActivity(intent);
+                            break;
+
+                    }
                 }
 
 
