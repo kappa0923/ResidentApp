@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -96,7 +97,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
         builder.setTicker("Switch on!");
         builder.setOngoing(true);
 
-        // 起動したいActivityのIntent
+        // 通知バーをタップしたときに起動したいActivityのIntent
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setContentIntent(pi);
@@ -132,11 +133,16 @@ public class NotificationChangeService extends Service implements SensorEventLis
                         case "uri":
                             // URL
                             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tmp[1]));
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                             startActivity(intent);
                             break;
                         case "app":
                             // アプリケーション
+                            PackageManager packageManager = getPackageManager();
+                            intent = packageManager.getLaunchIntentForPackage(tmp[1]);
+                            intent.setAction(Intent.ACTION_MAIN);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            startActivity(intent);
                             break;
                         case "HOME":
                             // HOMEボタンの呼び出し

@@ -154,15 +154,16 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
             }
         });
 
-
-
         // ホームボタンの追加
         homeButton = (Button)findViewById(R.id.homeButton);
         homeButton.setTypeface(tf);
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                intent.putExtra("morse", morse);
+                intent.putExtra("package", "HOME,HOME");
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
 
@@ -172,7 +173,10 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         phoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                intent.putExtra("morse", morse);
+                intent.putExtra("package", "CALL,CALL");
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
 
