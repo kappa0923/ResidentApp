@@ -3,8 +3,10 @@ package com.example.tomoyasu.residentapp;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +43,32 @@ public class NotificationChangeService extends Service implements SensorEventLis
     private boolean onsw = false;
     public static String morse = "";
     private int borderTime = 400;
+    private BroadcastReceiver broadcastReceiver =  new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                // Screenをoffにした時の処理
+                Log.i(TAG, "Screen off");
+
+                // センサーの開放
+                SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+                sensorManager.unregisterListener(NotificationChangeService.this);
+
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                // Screenをonにした時の処理
+                Log.i(TAG, "Screen on");
+
+                // センサーマネージャの登録
+                SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+                Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+                if (sensor != null) {
+                    sensorManager.registerListener(NotificationChangeService.this, sensor, SensorManager.SENSOR_DELAY_GAME);
+                    Log.i(TAG, "sensorListener");
+                }
+
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -80,6 +108,12 @@ public class NotificationChangeService extends Service implements SensorEventLis
             Log.i(TAG, "sensorListener");
         }
 
+        // BroadcastReceiverの登録
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(broadcastReceiver, intentFilter);
+
         // 非同期処理の開始
         countHandler = new Handler();
         countHandler.post(runnable);
@@ -117,12 +151,14 @@ public class NotificationChangeService extends Service implements SensorEventLis
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if (onsw && (System.currentTimeMillis() - startTime) > borderTime*4 && proximity == 0) {
-                onsw =false;
+            // 誤動作防止(長いやつを検出)
+            if (onsw && (System.currentTimeMillis() - startTime) > borderTime * 4 && proximity == 0) {
+                onsw = false;
                 morse = "";
             }
 
-            if (onsw && (System.currentTimeMillis() - endTime) > borderTime*2 && proximity != 0) {
+            // 入力されたモールス信号を確定
+            if (onsw && (System.currentTimeMillis() - endTime) > borderTime * 2 && proximity != 0) {
                 onsw = false;
                 Log.i(TAG, "morse:" + morse);
 
@@ -209,6 +245,9 @@ public class NotificationChangeService extends Service implements SensorEventLis
         // センサーの開放
         SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sensorManager.unregisterListener(this);
+
+        // ブロードキャストレシーバの開放
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
