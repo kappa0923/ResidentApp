@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
                     // サービスの停止
                     stopService(new Intent(MainActivity.this, NotificationChangeService.class));
                     break;
+                case R.id.TestButton:
+                    Log.i(TAG, "Wave Button");
+                    break;
             }
         }
     };
@@ -201,7 +204,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 各ボタンの設定
-        Button btn = (Button)findViewById(R.id.StartButton);
+        Button btn = (Button)findViewById(R.id.TestButton);
+        btn.setOnClickListener(btnListener);
+        btn.setTypeface(tf);
+
+        btn = (Button)findViewById(R.id.StartButton);
         btn.setOnClickListener(btnListener);
         btn.setTypeface(tf);
 

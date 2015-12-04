@@ -52,6 +52,17 @@
 
     </RelativeLayout>
 
+    <com.rey.material.widget.Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Material Button"
+        android:id="@+id/TestButton"
+        android:background="@drawable/button"
+        android:layout_margin="2dp"
+        app:rd_enable="true"
+        app:rd_rippleType="wave"
+        />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,7 +70,7 @@
         android:text="List Button"
         android:id="@+id/StartButton"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="2px"/>
+        android:layout_margin="2dp"/>
 
     <Button
         android:layout_width="match_parent"
@@ -68,7 +79,7 @@
         android:text="Stop Button"
         android:id="@+id/StopButton"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="2px"/>
+        android:layout_margin="2dp"/>
 
     <ListView
         android:layout_width="match_parent"
