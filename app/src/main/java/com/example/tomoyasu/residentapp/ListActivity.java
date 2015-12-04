@@ -77,6 +77,13 @@ public class ListActivity extends Activity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        overridePendingTransition(R.anim.in_right, R.anim.out_left);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
 

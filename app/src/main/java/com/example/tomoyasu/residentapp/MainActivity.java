@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.in_right, R.anim.out_left);
 
                     // サービスの停止
-//                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
+                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
                     break;
             }
         }
