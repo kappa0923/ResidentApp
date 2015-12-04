@@ -299,23 +299,34 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 onsw = false;
                 Log.i(TAG, "morse:" + morse);
 
-                // 入力されたモールスで振り分け
-                if (MainActivity.map.containsKey(morse)) {
-                    // モールス信号が登録済み
-                    MorseView.errorMsg = "登録済みの信号です";
+                if (morse.length() <= 1) {
+                    // モールス信号が短すぎる
+                    MorseView.errorMsg = "信号が短すぎます";
                     // 各ボタンを無効化
                     appButton.setEnabled(false);
                     webButton.setEnabled(false);
                     homeButton.setEnabled(false);
                     phoneButton.setEnabled(false);
                 } else {
-                    // モールス信号が登録可
-                    MorseView.errorMsg = "登録可能の信号です";
-                    // 各ボタンを有効化
-                    appButton.setEnabled(true);
-                    webButton.setEnabled(true);
-                    homeButton.setEnabled(true);
-                    phoneButton.setEnabled(true);
+
+                    // 入力されたモールスで振り分け
+                    if (MainActivity.map.containsKey(morse)) {
+                        // モールス信号が登録済み
+                        MorseView.errorMsg = "登録済みの信号です";
+                        // 各ボタンを無効化
+                        appButton.setEnabled(false);
+                        webButton.setEnabled(false);
+                        homeButton.setEnabled(false);
+                        phoneButton.setEnabled(false);
+                    } else {
+                        // モールス信号が登録可
+                        MorseView.errorMsg = "登録可能の信号です";
+                        // 各ボタンを有効化
+                        appButton.setEnabled(true);
+                        webButton.setEnabled(true);
+                        homeButton.setEnabled(true);
+                        phoneButton.setEnabled(true);
+                    }
                 }
             }
 
