@@ -99,6 +99,7 @@ public class NotificationChangeService extends Service implements SensorEventLis
 
         // 通知バーをタップしたときに起動したいActivityのIntent
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setContentIntent(pi);
 
