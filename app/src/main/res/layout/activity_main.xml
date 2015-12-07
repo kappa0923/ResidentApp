@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:text="Material Button"
         android:id="@+id/TestButton"
-        android:background="@drawable/button"
+        android:background="@drawable/button_items"
         android:layout_margin="2dp"
         app:rd_enable="true"
         app:rd_rippleType="wave"

@@ -54,7 +54,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
-            <Button
+            <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
@@ -65,8 +65,10 @@
                 android:text="app"
                 android:drawableTop="@drawable/rocket"
                 android:background="@drawable/button_items"
+                app:rd_enable="true"
+                app:rd_rippleType="wave"
                 />
-            <Button
+            <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
@@ -77,8 +79,10 @@
                 android:text="web"
                 android:drawableTop="@drawable/net"
                 android:background="@drawable/button_items"
+                app:rd_enable="true"
+                app:rd_rippleType="wave"
             />
-            <Button
+            <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
@@ -89,8 +93,10 @@
                 android:text="home"
                 android:drawableTop="@drawable/home"
                 android:background="@drawable/button_items"
+                app:rd_enable="true"
+                app:rd_rippleType="wave"
                 />
-            <Button
+            <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
@@ -103,6 +109,8 @@
                 android:textSize="6pt"
                 android:drawableTop="@drawable/phone"
                 android:background="@drawable/button_items"
+                app:rd_enable="true"
+                app:rd_rippleType="wave"
                 />
         </LinearLayout>
     </HorizontalScrollView>
