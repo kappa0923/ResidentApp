@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.TestButton:
                     Log.i(TAG, "Wave Button");
+                    intent = new Intent(MainActivity.this, TestActivity.class);
+//                    intent.setAction(Intent.ACTION_MAIN);
+                    startActivity(intent);
                     break;
             }
         }

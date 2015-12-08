@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".ListActivity" android:launchMode="singleTop" android:screenOrientation="portrait"/>
         <activity android:name=".MorseActivity" android:launchMode="singleTop" android:screenOrientation="portrait"/>
+        <activity android:name=".TestActivity" android:launchMode="singleTop" android:screenOrientation="portrait" />
+
         <service android:name=".NotificationChangeService" />
         <receiver android:name=".callReceiver">
             <intent-filter>
