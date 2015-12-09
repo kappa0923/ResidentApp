@@ -42,7 +42,13 @@ public class ListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            toolbar.setNavigationIcon(R.mipmap.ic_launcher);
+            toolbar.setNavigationIcon(R.drawable.arrow_back);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
             TextView textView = (TextView)findViewById(R.id.toolbar_title);
             textView.setTypeface(typeface);
         }
@@ -70,24 +76,6 @@ public class ListActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(new RecyclerAdapter(this, dataList));
 
-//        final ListView listView = new ListView(this);
-//        listView.setAdapter(new AppListAdapter(this, dataList));
-
-        //クリック処理
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                ResolveInfo item = appInfo.get(position);
-//                PackageManager pManager = getPackageManager();
-//                Intent intent = pManager.getLaunchIntentForPackage(item.activityInfo.packageName);
-//                // 一覧から取得したintentを元のactivityに返す
-//                intent.putExtra("package", item.activityInfo.packageName);
-//                setResult(RESULT_OK, intent);
-//                Log.i(TAG, "item clicked:" + intent);
-//                finish();
-//            }
-//        });
-//        setContentView(listView);
     }
 
     @Override
@@ -128,12 +116,13 @@ public class ListActivity extends AppCompatActivity {
         public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
             // データ表示
             AppData data = dataList.get(viewHolder.getLayoutPosition());
-            if (data != null) {
-//                viewHolder.textLabel = (TextView)findViewById(R.id.label);
-                viewHolder.textLabel.setText(data.label);
-                viewHolder.imageIcon.setImageDrawable(data.icon);
-                viewHolder.packageName.setText(data.pname);
-            }
+            // フォント変更
+            viewHolder.textLabel.setTypeface(typeface);
+            viewHolder.packageName.setTypeface(typeface);
+            // データ格納
+            viewHolder.textLabel.setText(data.label);
+            viewHolder.imageIcon.setImageDrawable(data.icon);
+            viewHolder.packageName.setText(data.pname);
 
             // クリック処理
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +146,7 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textLabel;
         public ImageView imageIcon;
         public TextView packageName;
@@ -169,50 +158,4 @@ public class ListActivity extends AppCompatActivity {
             packageName = (TextView)itemView.findViewById(R.id.pname);
         }
     }
-
-//    // アプリケーションのラベルとアイコンを表示するためのアダプタークラス
-//    private static class AppListAdapter extends ArrayAdapter<AppData> {
-//
-//        private final LayoutInflater mInflater;
-//
-//        public AppListAdapter(Context context, List<AppData> dataList) {
-//            super(context, R.layout.activity_list_item);
-//            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            addAll(dataList);
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//
-//            ViewHolder holder = new ViewHolder();
-//
-//            if (convertView == null) {
-//                convertView = mInflater.inflate(R.layout.activity_list_item, parent, false);
-//                holder.textLabel = (TextView) convertView.findViewById(R.id.label);
-//                holder.imageIcon = (ImageView) convertView.findViewById(R.id.icon);
-//                holder.packageName = (TextView) convertView.findViewById(R.id.pname);
-//                convertView.setTag(holder);
-//            } else {
-//                holder = (ViewHolder) convertView.getTag();
-//            }
-//
-//            // 表示データを取得
-//            final AppData data = getItem(position);
-//            // ラベルとアイコンをリストビューに設定
-//            holder.textLabel.setTypeface(typeface);
-//            holder.packageName.setTypeface(typeface);
-//            holder.textLabel.setText(data.label);
-//            holder.imageIcon.setImageDrawable(data.icon);
-//            holder.packageName.setText(data.pname);
-//
-//            return convertView;
-//        }
-//    }
-//
-//    // ビューホルダー
-//    private static class ViewHolder {
-//        TextView textLabel;
-//        ImageView imageIcon;
-//        TextView packageName;
-//    }
 }

@@ -10,18 +10,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -40,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private SwitchCompat sw;
     public static HashMap<String, String> map = new HashMap<>(); // <key_code, 実行形式, URI|パッケージ名>
     public static Typeface tf;
+    public List<AppData> dataList = new ArrayList<>();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +60,88 @@ public class MainActivity extends AppCompatActivity {
 
         tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
 
-        createMain();
+        setContentView(R.layout.activity_main);
+
+        // ツールバー
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationIcon(R.mipmap.ic_launcher);
+            TextView textView = (TextView)findViewById(R.id.toolbar_title);
+            textView.setTypeface(tf);
+        }
+
+        // トグルスイッチ
+        TextView textView = (TextView)findViewById(R.id.switch_text);
+        textView.setTypeface(tf);
+        sw = (SwitchCompat)findViewById(R.id.SwitchButton);
+        sw.setChecked(NotificationChangeService.state_Notifi);
+        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.i(TAG, "Switch On");
+                    startService(new Intent(MainActivity.this, NotificationChangeService.class));
+                } else {
+                    Log.i(TAG, "Switch Off");
+                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
+                }
+            }
+        });
+
+        // 各ボタンの設定
+        Button btn = (Button)findViewById(R.id.TestButton);
+        btn.setOnClickListener(btnListener);
+        btn.setTypeface(tf);
+
+        btn = (Button)findViewById(R.id.StartButton);
+        btn.setOnClickListener(btnListener);
+        btn.setTypeface(tf);
+
+        btn = (Button)findViewById(R.id.StopButton);
+        btn.setOnClickListener(btnListener);
+        btn.setTypeface(tf);
+
+        sw.setChecked(NotificationChangeService.state_Notifi);
+
+        // リストに一覧データを格納する
+        for (HashMap.Entry<String,String> app : map.entrySet()) {
+            AppData data = new AppData();
+            String[] tmp = app.getValue().split(",");
+            Bitmap bitmap;
+            switch (tmp[0]) {
+                case "uri":
+                    data.label = app.getKey();
+                    data.pname = "link:" + tmp[1];
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "app":
+                    PackageManager packageManager = getPackageManager();
+                    try {
+                        data.label = app.getKey();
+                        data.pname = "app:" + tmp[1];
+                        data.icon = packageManager.getApplicationIcon(tmp[1]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "HOME":
+                    data.label = app.getKey();
+                    data.pname = "HOME KEY";
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+            }
+            dataList.add(data);
+        }
+
+        // リストビューにアプリケーションの一覧を表示する
+        mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view_main);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setHasFixedSize(true);
+        mAdapter = new RecyclerAdapter(this, dataList);
+        mRecyclerView.setAdapter(mAdapter);
 
     }
 
@@ -119,6 +202,38 @@ public class MainActivity extends AppCompatActivity {
             // リストから返ってきたintentをmapに登録
             map.put(hoge, fuga);
 
+            String[] tmp = fuga.split(",");
+
+            // リストを更新
+            AppData data = new AppData();
+            data.label = hoge;
+            data.pname = tmp[1];
+            switch (tmp[0]) {
+                case "uri":
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "app":
+                    PackageManager packageManager = getPackageManager();
+                    try {
+                        data.icon = packageManager.getApplicationIcon(tmp[1]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "HOME":
+                    data.pname = "HOME KEY";
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                default:
+                    data.pname = "empty";
+                    data.label = "";
+            }
+            dataList.add(data);
+            Log.i(TAG, "Insert:" + data.pname);
+            mAdapter.notifyDataSetChanged();
+
             mapWrite(map);
         }
     }
@@ -127,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        createMain();
+//        createMain();
 //        sw.setChecked(NotificationChangeService.state_Notifi);
 //
 //        // リストに一覧データを格納する
@@ -177,94 +292,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createMain() {
-        setContentView(R.layout.activity_main);
 
-        // ツールバー
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            toolbar.setNavigationIcon(R.mipmap.ic_launcher);
-            TextView textView = (TextView)findViewById(R.id.toolbar_title);
-            textView.setTypeface(tf);
-        }
-
-        // トグルスイッチ
-        TextView textView = (TextView)findViewById(R.id.switch_text);
-        textView.setTypeface(tf);
-        sw = (SwitchCompat)findViewById(R.id.SwitchButton);
-        sw.setChecked(NotificationChangeService.state_Notifi);
-        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.i(TAG, "Switch On");
-                    startService(new Intent(MainActivity.this, NotificationChangeService.class));
-                } else {
-                    Log.i(TAG, "Switch Off");
-                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
-                }
-            }
-        });
-
-        // 各ボタンの設定
-        Button btn = (Button)findViewById(R.id.TestButton);
-        btn.setOnClickListener(btnListener);
-        btn.setTypeface(tf);
-
-        btn = (Button)findViewById(R.id.StartButton);
-        btn.setOnClickListener(btnListener);
-        btn.setTypeface(tf);
-
-        btn = (Button)findViewById(R.id.StopButton);
-        btn.setOnClickListener(btnListener);
-        btn.setTypeface(tf);
-
-        sw.setChecked(NotificationChangeService.state_Notifi);
-
-        // リストに一覧データを格納する
-        final List<AppData> dataList = new ArrayList<>();
-        for (HashMap.Entry<String,String> app : map.entrySet()) {
-            AppData data = new AppData();
-            String[] tmp = app.getValue().split(",");
-            Bitmap bitmap;
-            switch (tmp[0]) {
-                case "uri":
-                    data.label = app.getKey();
-                    data.pname = "link:" + tmp[1];
-                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
-                    data.icon = new BitmapDrawable(getResources(), bitmap);
-                    break;
-                case "app":
-                    PackageManager packageManager = getPackageManager();
-                    try {
-                        data.label = app.getKey();
-                        data.pname = "app:" + tmp[1];
-                        data.icon = packageManager.getApplicationIcon(tmp[1]);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case "HOME":
-                    data.label = app.getKey();
-                    data.pname = "HOME KEY";
-                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
-                    data.icon = new BitmapDrawable(getResources(), bitmap);
-                    break;
-            }
-            dataList.add(data);
-        }
 
         // リストビューを生成
-        final ListView listView = (ListView)findViewById(R.id.listView);
-        listView.setAdapter(new AppListAdapter(this, dataList));
-
-        //クリック処理
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
+//        final ListView listView = (ListView)findViewById(R.id.listView);
+//        listView.setAdapter(new AppListAdapter(this, dataList));
+//
+//        //クリック処理
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//            }
+//        });
     }
 
     public void mapWrite(HashMap<String,String> map) {
@@ -310,50 +350,109 @@ public class MainActivity extends AppCompatActivity {
         String pname;
     }
 
+    public class RecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
+        private LayoutInflater mInflater;
+
+        public RecyclerAdapter(Context context, List<AppData> data) {
+            super();
+            mInflater = LayoutInflater.from(context);
+        }
+
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = mInflater.inflate(R.layout.activity_list_item, parent, false);
+            return new ViewHolder(v);
+        }
+
+        public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+            // データ表示
+            Log.i(TAG, Integer.toString(position));
+            AppData data = dataList.get(viewHolder.getLayoutPosition());
+            // フォント変更
+            viewHolder.textLabel.setTypeface(tf);
+            viewHolder.packageName.setTypeface(tf);
+            // データ格納
+            viewHolder.textLabel.setText(data.label);
+            viewHolder.imageIcon.setImageDrawable(data.icon);
+            viewHolder.packageName.setText(data.pname);
+
+            // クリック処理
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // ロングタップしたものを削除する
+                    dataList.remove(viewHolder.getAdapterPosition());
+                    notifyItemRemoved(viewHolder.getAdapterPosition());
+
+                    Log.i(TAG, viewHolder.textLabel.getText().toString());
+                    map.remove(viewHolder.textLabel.getText().toString());
+                    mapWrite(map);
+                    return true;
+                }
+            });
+        }
+
+        public int getItemCount() {
+            return dataList.size();
+        }
+    }
+
+    private static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView textLabel;
+        public ImageView imageIcon;
+        public TextView packageName;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            textLabel = (TextView)itemView.findViewById(R.id.label);
+            imageIcon = (ImageView)itemView.findViewById(R.id.icon);
+            packageName = (TextView)itemView.findViewById(R.id.pname);
+        }
+    }
+
     // アプリケーションのラベルとアイコンを表示するためのアダプタークラス
-    private static class AppListAdapter extends ArrayAdapter<AppData> {
-
-        private final LayoutInflater mInflater;
-
-        public AppListAdapter(Context context, List<AppData> dataList) {
-            super(context, R.layout.activity_list_item);
-            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            addAll(dataList);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            ViewHolder holder = new ViewHolder();
-
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.activity_list_item, parent, false);
-                holder.textLabel = (TextView) convertView.findViewById(R.id.label);
-                holder.imageIcon = (ImageView) convertView.findViewById(R.id.icon);
-                holder.packageName = (TextView) convertView.findViewById(R.id.pname);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            // 表示データを取得
-            final AppData data = getItem(position);
-            // ラベルとアイコンをリストビューに設定
-            holder.textLabel.setTypeface(tf);
-            holder.packageName.setTypeface(tf);
-            holder.textLabel.setText(data.label);
-            holder.imageIcon.setImageDrawable(data.icon);
-            holder.packageName.setText(data.pname);
-
-            return convertView;
-        }
-    }
-
-    // ビューホルダー
-    private static class ViewHolder {
-        TextView textLabel;
-        ImageView imageIcon;
-        TextView packageName;
-    }
+//    private static class AppListAdapter extends ArrayAdapter<AppData> {
+//
+//        private final LayoutInflater mInflater;
+//
+//        public AppListAdapter(Context context, List<AppData> dataList) {
+//            super(context, R.layout.activity_list_item);
+//            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            addAll(dataList);
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//
+//            ViewHolder holder = new ViewHolder();
+//
+//            if (convertView == null) {
+//                convertView = mInflater.inflate(R.layout.activity_list_item, parent, false);
+//                holder.textLabel = (TextView) convertView.findViewById(R.id.label);
+//                holder.imageIcon = (ImageView) convertView.findViewById(R.id.icon);
+//                holder.packageName = (TextView) convertView.findViewById(R.id.pname);
+//                convertView.setTag(holder);
+//            } else {
+//                holder = (ViewHolder) convertView.getTag();
+//            }
+//
+//            // 表示データを取得
+//            final AppData data = getItem(position);
+//            // ラベルとアイコンをリストビューに設定
+//            holder.textLabel.setTypeface(tf);
+//            holder.packageName.setTypeface(tf);
+//            holder.textLabel.setText(data.label);
+//            holder.imageIcon.setImageDrawable(data.icon);
+//            holder.packageName.setText(data.pname);
+//
+//            return convertView;
+//        }
+//    }
+//
+//    // ビューホルダー
+//    private static class ViewHolder {
+//        TextView textLabel;
+//        ImageView imageIcon;
+//        TextView packageName;
+//    }
 
 }
