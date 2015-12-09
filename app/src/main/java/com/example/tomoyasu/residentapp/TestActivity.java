@@ -63,13 +63,14 @@ public class TestActivity extends Activity {
             viewHolder.textView.setText(data);
 
             // クリック処理
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
-                    // タップするとリストから削除
+                public boolean onLongClick(View v) {
+                    // 長押しするとリストから削除
                     Log.i("LocalService", "position:" + viewHolder.getAdapterPosition());
                     mDataset.remove(viewHolder.getAdapterPosition());
                     notifyItemRemoved(viewHolder.getAdapterPosition());
+                    return true;
                 }
             });
         }
