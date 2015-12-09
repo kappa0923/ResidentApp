@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
         private final LayoutInflater mInflater;
 
         public AppListAdapter(Context context, List<AppData> dataList) {
-            super(context, R.layout.activity_list);
+            super(context, R.layout.activity_list_item);
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             addAll(dataList);
         }
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
             ViewHolder holder = new ViewHolder();
 
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.activity_list, parent, false);
+                convertView = mInflater.inflate(R.layout.activity_list_item, parent, false);
                 holder.textLabel = (TextView) convertView.findViewById(R.id.label);
                 holder.imageIcon = (ImageView) convertView.findViewById(R.id.icon);
                 holder.packageName = (TextView) convertView.findViewById(R.id.pname);
