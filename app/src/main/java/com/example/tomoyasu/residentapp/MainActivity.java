@@ -23,6 +23,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -45,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+        tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
 
+        // ファイルのロード&セーブ
         File file = this.getFileStreamPath("map.txt");
         if (!file.exists()) {
             // ファイルが存在しなかったら生成
@@ -57,10 +61,6 @@ public class MainActivity extends AppCompatActivity {
             // ファイルが存在したらロード
             map = mapRead();
         }
-
-        tf = Typeface.createFromAsset(getAssets(), "mgenplus-2c-regular.ttf");
-
-        setContentView(R.layout.activity_main);
 
         // ツールバー
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -241,72 +241,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-//        createMain();
-//        sw.setChecked(NotificationChangeService.state_Notifi);
-//
-//        // リストに一覧データを格納する
-//        final List<AppData> dataList = new ArrayList<>();
-//        for (HashMap.Entry<String,String> app : map.entrySet()) {
-//            AppData data = new AppData();
-//            String[] tmp = app.getValue().split(",");
-//            Bitmap bitmap;
-//            switch (tmp[0]) {
-//                case "uri":
-//                    data.label = app.getKey();
-//                    data.pname = "link:" + tmp[1];
-//                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.net);
-//                    data.icon = new BitmapDrawable(getResources(), bitmap);
-//                    break;
-//                case "app":
-//                    PackageManager packageManager = getPackageManager();
-//                    try {
-//                        data.label = app.getKey();
-//                        data.pname = "app:" + tmp[1];
-//                        data.icon = packageManager.getApplicationIcon(tmp[1]);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    break;
-//                case "HOME":
-//                    data.label = app.getKey();
-//                    data.pname = "HOME KEY";
-//                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
-//                    data.icon = new BitmapDrawable(getResources(), bitmap);
-//                    break;
-//            }
-//            dataList.add(data);
-//        }
-//
-//        // リストビューを生成
-//        final ListView listView = (ListView)findViewById(R.id.listView);
-//        listView.setAdapter(new AppListAdapter(this, dataList));
-//
-//        //クリック処理
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//            }
-//        });
     }
 
-    public void createMain() {
-
-
-        // リストビューを生成
-//        final ListView listView = (ListView)findViewById(R.id.listView);
-//        listView.setAdapter(new AppListAdapter(this, dataList));
-//
-//        //クリック処理
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//            }
-//        });
-    }
-
+    // mapの保存
     public void mapWrite(HashMap<String,String> map) {
         try {
             Log.i(TAG,"map write");
@@ -322,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // mapの読み込み
     public HashMap<String,String> mapRead() {
         HashMap<String,String> temp_map = new HashMap<>();
         try {
@@ -350,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
         String pname;
     }
 
+    // アダプタークラス
     public class RecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
         private LayoutInflater mInflater;
 
@@ -380,12 +319,37 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onLongClick(View v) {
                     // ロングタップしたものを削除する
-                    dataList.remove(viewHolder.getAdapterPosition());
-                    notifyItemRemoved(viewHolder.getAdapterPosition());
+                    final Dialog mDialog = new Dialog(MainActivity.this);
+                    mDialog.title("Delete this shortcut?")
+                            .positiveAction("Delete")
+                            .positiveActionClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.i(TAG, "Dialog OK");
+                                    dataList.remove(viewHolder.getAdapterPosition());
+                                    notifyItemRemoved(viewHolder.getAdapterPosition());
 
-                    Log.i(TAG, viewHolder.textLabel.getText().toString());
-                    map.remove(viewHolder.textLabel.getText().toString());
-                    mapWrite(map);
+                                    map.remove(viewHolder.textLabel.getText().toString());
+                                    mapWrite(map);
+                                    mDialog.dismiss();
+                                }
+                            })
+                            .negativeAction("CANCEL")
+                            .negativeActionClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDialog.dismiss();
+                                }
+                            })
+                            .cancelable(true)
+                            .show();
+
+//                    dataList.remove(viewHolder.getAdapterPosition());
+//                    notifyItemRemoved(viewHolder.getAdapterPosition());
+//3
+//                    Log.i(TAG, viewHolder.textLabel.getText().toString());
+//                    map.remove(viewHolder.textLabel.getText().toString());
+//                    mapWrite(map);
                     return true;
                 }
             });
