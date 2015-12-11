@@ -53,11 +53,12 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:weightSum="1">
             <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:layout_margin="6dp"
                 android:padding="10dp"
                 android:id="@+id/appButton"
@@ -71,7 +72,7 @@
             <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:layout_margin="6dp"
                 android:padding="10dp"
                 android:id="@+id/webButton"
@@ -85,7 +86,7 @@
             <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:layout_margin="6dp"
                 android:padding="10dp"
                 android:id="@+id/homeButton"
@@ -99,13 +100,29 @@
             <com.rey.material.widget.Button
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3"
+                android:layout_weight="0.4"
                 android:layout_margin="6dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="4dp"
                 android:id="@+id/phoneButton"
                 android:gravity="bottom|center_horizontal"
                 android:text="catch\nphone"
+                android:textSize="6pt"
+                android:drawableTop="@drawable/phone"
+                android:background="@drawable/button_items"
+                app:rd_enable="true"
+                app:rd_rippleType="wave"
+                />
+            <com.rey.material.widget.Button
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4"
+                android:layout_margin="6dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="4dp"
+                android:id="@+id/callButton"
+                android:gravity="bottom|center_horizontal"
+                android:text="call\nphone"
                 android:textSize="6pt"
                 android:drawableTop="@drawable/phone"
                 android:background="@drawable/button_items"

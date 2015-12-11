@@ -188,7 +188,11 @@ public class NotificationChangeService extends Service implements SensorEventLis
                             intent.addCategory(Intent.CATEGORY_HOME);
                             startActivity(intent);
                             break;
-
+                        case "TEL":
+                            intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + tmp[1]));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            startActivity(intent);
+                            break;
                     }
                 }
 

@@ -42,7 +42,6 @@
         android:ems="40"
         android:textSize="6pt"
         android:id="@+id/editText"
-        android:inputType="textUri"
         android:hint="http:// OR https://"
         android:textColorHint="@color/gray"
         app:et_supportMode="helper"

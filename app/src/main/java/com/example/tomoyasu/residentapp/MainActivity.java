@@ -89,19 +89,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 各ボタンの設定
-//        Button btn = (Button)findViewById(R.id.TestButton);
-//        btn.setOnClickListener(btnListener);
-//        btn.setTypeface(tf);
-//
-//        btn = (Button)findViewById(R.id.StartButton);
-//        btn.setOnClickListener(btnListener);
-//        btn.setTypeface(tf);
-//
-//        btn = (Button)findViewById(R.id.StopButton);
-//        btn.setOnClickListener(btnListener);
-//        btn.setTypeface(tf);
-
         FloatingActionButton mButton = (FloatingActionButton)findViewById(R.id.fab);
         mButton.setOnClickListener(btnListener);
 
@@ -135,6 +122,18 @@ public class MainActivity extends AppCompatActivity {
                     bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
                     data.icon = new BitmapDrawable(getResources(), bitmap);
                     break;
+                case "CALL":
+                    data.label = app.getKey();
+                    data.pname = "Catch phone";
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.phone);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "TEL":
+                    data.label = app.getKey();
+                    data.pname = "TEL:" + tmp[1];
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.phone);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
             }
             dataList.add(data);
         }
@@ -152,31 +151,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             switch(v.getId()) {
-//                case R.id.StartButton:
-//                    Log.i(TAG, "Start Button");
-//                    Intent intent = new Intent(MainActivity.this, ListActivity.class);
-//                    intent.setAction(Intent.ACTION_PICK);
-//                    startActivityForResult(intent, 1);
-//                    // アニメーションの設定
-//                    overridePendingTransition(R.anim.in_right, R.anim.out_left);
-//                    break;
-//                case R.id.StopButton:
-//                    Log.i(TAG, "Stop Button");
-//                    Intent intent1 = new Intent(MainActivity.this, MorseActivity.class);
-//                    intent1.setAction(Intent.ACTION_PICK);
-//                    startActivityForResult(intent1, 2);
-//                    // アニメーションの設定
-//                    overridePendingTransition(R.anim.in_right, R.anim.out_left);
-//
-//                    // サービスの停止
-//                    stopService(new Intent(MainActivity.this, NotificationChangeService.class));
-//                    break;
-//                case R.id.TestButton:
-//                    Log.i(TAG, "Wave Button");
-//                    intent = new Intent(MainActivity.this, TestActivity.class);
-////                    intent.setAction(Intent.ACTION_MAIN);
-//                    startActivity(intent);
-//                    break;
                 case R.id.fab:
                     Log.i(TAG, "Fab Button");
                     Intent intent = new Intent(MainActivity.this, MorseActivity.class);
@@ -238,6 +212,15 @@ public class MainActivity extends AppCompatActivity {
                 case "HOME":
                     data.pname = "HOME KEY";
                     bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "CALL":
+                    data.pname = "Catch phone";
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.phone);
+                    data.icon = new BitmapDrawable(getResources(), bitmap);
+                    break;
+                case "TEL":
+                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.phone);
                     data.icon = new BitmapDrawable(getResources(), bitmap);
                     break;
                 default:

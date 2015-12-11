@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,14 +41,14 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
     private long startTime, endTime;
     private boolean onsw = false;
     public static String morse = "";
-    public static String uri = "";
+    public static String uri = "", number = "";
     private int borderTime = 400;
     private Typeface tf;
     private View view;
     private Dialog dialog;
     private int view_width;
     private Intent intent;
-    private Button webButton, appButton, homeButton, phoneButton, okButton;
+    private Button webButton, appButton, homeButton, phoneButton, callButton, okButton;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -127,6 +128,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
 
                 // URLを入力するためのフィールド
                 final EditText editText = (EditText) dialog.findViewById(R.id.editText);
+                editText.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
                 editText.setTypeface(tf);
                 // ダイアログの内容が変更されるたびに呼ばれる
                 editText.addTextChangedListener(new TextWatcher() {
@@ -205,7 +207,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
             }
         });
 
-        // 通話ボタンの追加
+        // 電話を受けるボタンの追加
         phoneButton = (Button)findViewById(R.id.phoneButton);
         phoneButton.setTypeface(tf);
         phoneButton.setEnabled(false);
@@ -216,6 +218,75 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 intent.putExtra("package", "CALL,CALL");
                 setResult(RESULT_OK, intent);
                 finish();
+            }
+        });
+
+        // 電話をかけるボタンの追加
+        callButton = (Button)findViewById(R.id.callButton);
+        callButton.setTypeface(tf);
+        callButton.setEnabled(false);
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog = new Dialog(MorseActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog);
+
+                // windowサイズを取得
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.width = view_width;
+                dialog.getWindow().setAttributes(lp);
+
+                // dialogの要素
+                TextView textView1 = (TextView) dialog.findViewById(R.id.dialog_title);
+                textView1.setText("make call shortcut");
+                textView1.setTypeface(tf);
+
+                textView1 = (TextView) dialog.findViewById(R.id.dialog_text);
+                textView1.setTypeface(tf);
+
+                textView1 = (TextView) dialog.findViewById(R.id.dialog_morse);
+                textView1.setText(morse);
+                textView1.setTypeface(tf);
+
+                // URLを入力するためのフィールド
+                final EditText editText = (EditText) dialog.findViewById(R.id.editText);
+                editText.setInputType(InputType.TYPE_CLASS_PHONE);
+                editText.setTypeface(tf);
+
+                // Dialog cancel button
+                Button button = (Button) dialog.findViewById(R.id.button_cancel);
+                button.setTypeface(tf);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Dialog CANCEL");
+
+                        dialog.dismiss();
+                    }
+                });
+
+                // Dialog OK button
+                okButton = (Button) dialog.findViewById(R.id.button_ok);
+                okButton.setTypeface(tf);
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i(TAG, "Dialog OK");
+                        if (!editText.getText().toString().equals("")) {
+                            // OKタップ時の返すintent
+                            number = editText.getText().toString();
+                            intent.putExtra("morse", morse);
+                            intent.putExtra("package", "TEL," + number);
+                            setResult(RESULT_OK, intent);
+
+                            dialog.dismiss();
+                            finish();
+                        }
+                    }
+                });
+
+                dialog.show();
             }
         });
 
