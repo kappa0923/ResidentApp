@@ -13,14 +13,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import com.rey.material.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +47,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
     private Dialog dialog;
     private int view_width;
     private Intent intent;
-    private Button webButton, appButton, homeButton, phoneButton;
+    private Button webButton, appButton, homeButton, phoneButton, okButton;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -122,7 +125,34 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 textView1.setText(morse);
                 textView1.setTypeface(tf);
 
+                // URLを入力するためのフィールド
                 final EditText editText = (EditText) dialog.findViewById(R.id.editText);
+                editText.setTypeface(tf);
+                // ダイアログの内容が変更されるたびに呼ばれる
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+
+                        if ( s.toString().startsWith("http://") || s.toString().startsWith("https://")) {
+                            okButton.setEnabled(true);
+                            editText.setError(null);
+                            editText.setHelper("Enter URL");
+                        } else {
+                            okButton.setEnabled(false);
+                            editText.setError("Enter URL only: start with 'http://' or 'https://'");
+                            editText.setHelper(null);
+                        }
+                    }
+                });
 
                 // Dialog cancel button
                 Button button = (Button) dialog.findViewById(R.id.button_cancel);
@@ -137,9 +167,10 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
                 });
 
                 // Dialog OK button
-                button = (Button) dialog.findViewById(R.id.button_ok);
-                button.setTypeface(tf);
-                button.setOnClickListener(new View.OnClickListener() {
+                okButton = (Button) dialog.findViewById(R.id.button_ok);
+                okButton.setTypeface(tf);
+                okButton.setEnabled(false);
+                okButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Log.i(TAG, "Dialog OK");

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -34,15 +35,28 @@
         android:id="@+id/dialog_morse"
         />
 
-    <EditText
+    <com.rey.material.widget.EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:ems="40"
         android:textSize="6pt"
-        android:inputType="textUri"
         android:id="@+id/editText"
-        android:hint="URL"/>
+        android:inputType="textUri"
+        android:hint="http:// OR https://"
+        android:textColorHint="@color/gray"
+        app:et_supportMode="helper"
+        app:et_labelTextColor="@color/blue"
+        app:et_labelTextSize="6pt"
+        app:et_labelPadding="1dp"
+        app:et_labelInAnim="@anim/abc_fade_in"
+        app:et_labelOutAnim="@anim/abc_fade_out"
+        app:et_labelEnable="true"
+        app:et_supportTextColor="@color/blue"
+        app:et_supportTextErrorColor="@color/red"
+        app:et_dividerColor="@color/blue"
+        app:et_dividerErrorColor="@color/red"
+        app:et_dividerHeight="2dp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
