@@ -83,6 +83,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         // アプリ追加ボタン
         appButton = (Button)findViewById(R.id.appButton);
         appButton.setTypeface(tf);
+        appButton.setEnabled(false);
         appButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +98,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         // webショートカット追加ボタン
         webButton = (Button)findViewById(R.id.webButton);
         webButton.setTypeface(tf);
+        webButton.setEnabled(false);
         webButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,6 +163,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         // ホームボタンの追加
         homeButton = (Button)findViewById(R.id.homeButton);
         homeButton.setTypeface(tf);
+        homeButton.setEnabled(false);
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,6 +177,7 @@ public class MorseActivity extends AppCompatActivity implements SensorEventListe
         // 通話ボタンの追加
         phoneButton = (Button)findViewById(R.id.phoneButton);
         phoneButton.setTypeface(tf);
+        phoneButton.setEnabled(false);
         phoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
